@@ -37,8 +37,7 @@ resource "google_compute_instance" "bastion" {
   tags = var.gce_tags
   provisioner "local-exec" {
     #multiple line command
-    command = <<EOF
-      sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' -u debian --private-key=private_key.pem '${path.module}'/bastion-playbook.yml -e kubeconfig='${var.kubeconfig}'
+    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' -u debian --private-key=private_key.pem '${path.module}'/bastion-playbook.yml -e kubeconfig='${var.kubeconfig}'"
   }
 }
 
@@ -55,13 +54,3 @@ resource "google_compute_firewall" "bastion_ssh" {
   source_ranges = var.gcf_source_ranges
   target_tags   = var.gcf_target_tags
 }
-
-# resource "null_resource" "bastion_provisioner" {
-#   triggers = {
-#     playbook_content = filesha256("${path.module}/bastion-playbook.yml")
-#   }
-
-#   provisioner "local-exec" {
-#     command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${google_compute_instance.bastion.network_interface.0.access_config.0.nat_ip},' -u debian --private-key=private_key.pem '${path.module}'/bastion-playbook.yml -e kubeconfig='${var.kubeconfig}'"
-#   }
-# }
