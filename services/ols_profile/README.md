@@ -106,9 +106,6 @@ docker-compose down
 
 This will stop and remove the containers, but keep the MongoDB data persistent.
 
-### License
-
-This project is licensed under the [Apache License](LICENSE).
 
 ### Acknowledgements
 
