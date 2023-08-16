@@ -2,9 +2,14 @@
 - hosts: all
   become: yes
   tasks:
+    - name: Get stable kubectl version
+      command: curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt
+      register: stable_version
+      changed_when: false
+
     - name: Download kubectl
       get_url:
-        url: https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+        url: "https://storage.googleapis.com/kubernetes-release/release/{{ stable_version.stdout }}/bin/linux/amd64/kubectl"
         dest: /usr/local/bin/kubectl
         mode: '0755'
 
@@ -16,8 +21,15 @@
     - debug:
         var: version.stdout
 
+    - name: Ensure .kube directory exists
+      file:
+        path: /home/debian/.kube
+        state: directory
+        owner: debian
+        group: debian
+        mode: '0755'
+
     - name: Setup kubeconfig
       copy:
         content: "{{ kubeconfig }}"
         dest: "/home/debian/.kube/config"
-
