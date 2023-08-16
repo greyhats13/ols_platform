@@ -12,8 +12,6 @@ resource "google_compute_instance" "bastion" {
     }
   }
 
-
-
   network_interface {
     subnetwork = var.subnet_self_link
     access_config {

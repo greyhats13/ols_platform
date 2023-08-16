@@ -7,6 +7,10 @@ module "vpc" {
   code                     = "network"
   feature                  = ["vpc", "subnet"]
   subnetwork_ip_cidr_range = "10.0.0.0/16"
+  pods_range_name          = "pods-range"
+  pods_ip_cidr_range       = "172.16.0.0/16"
+  services_range_name      = "services-range"
+  services_ip_cidr_range   = "172.17.0.0/16"
 }
 
 # create gce from modules gce
@@ -28,4 +32,31 @@ module "bastion" {
   gcf_ports         = ["22"]
   gcf_source_ranges = ["0.0.0.0/0"]
   gcf_target_tags   = ["bastion"]
+}
+
+# create gke from modules gke
+module "gke" {
+  source                            = "../modules/gke"
+  region                            = "asia-southeast2"
+  unit                              = "ols"
+  env                               = "dev"
+  code                              = "gke"
+  feature                           = ["gke", "nodepool"]
+  network_self_link                 = module.vpc.vpc_self_link
+  subnet_self_link                  = module.vpc.subnet_self_link
+  gke_pods_secondary_range_name     = "pods-range"
+  gke_services_secondary_range_name = "services-range"
+  gke_remove_default_node_pool      = true
+  gke_initial_node_count            = 1
+  gke_issue_client_certificate      = true
+  gke_oauth_scopes                  = ["https://www.googleapis.com/auth/cloud-platform"]
+  ondemand_node_count               = 2
+  ondemand_machine_type             = "e2-medium"
+  ondemand_tags                     = ["ondemand"]
+  ondemand_oauth_scopes             = ["https://www.googleapis.com/auth/logging.write", "https://www.googleapis.com/auth/monitoring"]
+  preemptible_machine_type          = "e2-medium"
+  preemptible_tags                  = ["preemptible"]
+  preemptible_oauth_scopes          = ["https://www.googleapis.com/auth/logging.write", "https://www.googleapis.com/auth/monitoring"]
+  preemptible_min_node_count        = 0
+  preemptible_max_node_count        = 20
 }

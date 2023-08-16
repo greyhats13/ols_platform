@@ -1,5 +1,3 @@
-
-
 #Naming Standard
 variable "region" {
   type        = string
