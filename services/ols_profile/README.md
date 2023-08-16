@@ -110,5 +110,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
  storing profiles and categories.
 - Redis is used for caching data and improving performance.
 - Docker and Docker Compose are used for containerization and easy deployment.
-
-Feel free to customize and use this microservice as a starting point for your own projects. Happy coding!
