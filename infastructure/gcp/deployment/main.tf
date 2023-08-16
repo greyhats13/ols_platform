@@ -41,7 +41,7 @@ module "gke" {
   unit                              = "ols"
   env                               = "dev"
   code                              = "gke"
-  feature                           = ["gke", "nodepool"]
+  feature                           = ["cluster", "np"]
   network_self_link                 = module.vpc.vpc_self_link
   subnet_self_link                  = module.vpc.subnet_self_link
   gke_pods_secondary_range_name     = "pods-range"
