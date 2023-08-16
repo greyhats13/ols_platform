@@ -1,13 +1,7 @@
 # create ssh private key
 resource "tls_private_key" "bastion_ssh" {
   algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "local_file" "bastion_private_key" {
-  content  = tls_private_key.bastion_ssh.private_key_pem
-  filename = "${path.cwd}/priv.pem"
-  file_permission = "0400"
+  rsa_bits  = 2048
 }
 
 # Bastion host
@@ -36,10 +30,7 @@ resource "google_compute_instance" "bastion" {
 
   tags = var.gce_tags
   provisioner "local-exec" {
-    environment = {
-      ANSIBLE_PRIVATE_KEY_FILE = tls_private_key.bastion_ssh.private_key_pem
-    }
-    command = "ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' -u debian --private-key=${path.cwd}/priv.pem ${path.module}/bastion-playbook.yml -e kubeconfig='${var.kubeconfig}'"
+    command = "sleep 10 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' -u debian --private-key ${tls_private_key.bastion_ssh.private_key_pem} -e 'pub_key=${tls_private_key.bastion_ssh.public_key_openssh}' ${path.module}/bastion-playbook.yml -e kubeconfig='${var.kubeconfig}'"
   }
 }
 
