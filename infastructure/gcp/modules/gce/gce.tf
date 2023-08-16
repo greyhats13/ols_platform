@@ -6,7 +6,7 @@ resource "tls_private_key" "tls" {
 
 resource "local_file" "private_key" {
   content  = tls_private_key.tls.private_key_pem
-  filename = "${path.cwd}/tmp/private_key.pem"
+  filename = "private_key.pem"
   file_permission = "0400"
 }
 
@@ -36,7 +36,7 @@ resource "google_compute_instance" "bastion" {
 
   tags = var.gce_tags
   provisioner "local-exec" {
-    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' -u debian --private-key=/tmp/private_key.pem '${path.module}'/bastion-playbook.yml -e kubeconfig='${var.kubeconfig}'"
+    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' -u debian --private-key=private_key.pem '${path.module}'/bastion-playbook.yml -e kubeconfig='${var.kubeconfig}'"
   }
 }
 
