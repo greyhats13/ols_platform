@@ -1,6 +1,5 @@
 ---
 - hosts: all
-  become: yes
   tasks:
     - name: Get stable kubectl version
       command: curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt
@@ -8,6 +7,7 @@
       changed_when: false
 
     - name: Download kubectl
+      become: yes
       get_url:
         url: "https://storage.googleapis.com/kubernetes-release/release/{{ stable_version.stdout }}/bin/linux/amd64/kubectl"
         dest: /usr/local/bin/kubectl
@@ -33,3 +33,6 @@
       copy:
         content: "{{ kubeconfig }}"
         dest: "/home/debian/.kube/config"
+        owner: debian
+        group: debian
+        mode: '0644'

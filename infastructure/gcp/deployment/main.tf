@@ -45,7 +45,7 @@ module "gke" {
 }
 
 
-# create gce from modules gce
+# # create gce from modules gce
 module "bastion" {
   source            = "../modules/gce"
   region            = "asia-southeast2"
