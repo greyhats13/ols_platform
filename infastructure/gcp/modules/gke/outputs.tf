@@ -1,5 +1,5 @@
 output "kubeconfig" {
-  value = <<EOT
+  value     = <<EOT
     apiVersion: v1
     clusters:
     - cluster:
@@ -20,4 +20,5 @@ output "kubeconfig" {
         client-certificate-data: ${google_container_cluster.cluster.master_auth.0.client_certificate}
         client-key-data: ${google_container_cluster.cluster.master_auth.0.client_key}
   EOT
+  sensitive = true
 }
