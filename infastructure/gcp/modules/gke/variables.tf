@@ -57,6 +57,16 @@ variable "ondemand_machine_type" {
   description = "the machine type to use"
 }
 
+variable "ondemand_disk_size_gb" {
+  type        = number
+  description = "disk size"
+}
+
+variable "ondemand_disk_type" {
+  type        = string
+  description = "disk type"
+}
+
 variable "ondemand_oauth_scopes" {
   type        = list(string)
   description = "oauth scopes"
@@ -71,6 +81,16 @@ variable "ondemand_tags" {
 variable "preemptible_machine_type" {
   type        = string
   description = "the machine type to use"
+}
+
+variable "preemptible_disk_size_gb" {
+  type        = number
+  description = "disk size"
+}
+
+variable "preemptible_disk_type" {
+  type        = string
+  description = "disk type"
 }
 
 variable "preemptible_oauth_scopes" {

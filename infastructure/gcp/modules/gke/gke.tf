@@ -32,6 +32,8 @@ resource "google_container_node_pool" "ondemand" {
   node_config {
     preemptible  = false
     machine_type = var.ondemand_machine_type
+    disk_size_gb = var.ondemand_disk_size_gb
+    disk_type    = var.ondemand_disk_type
 
     metadata = {
       disable-legacy-endpoints = true
@@ -53,6 +55,8 @@ resource "google_container_node_pool" "preemptible" {
   node_config {
     preemptible  = true
     machine_type = var.preemptible_machine_type
+    disk_size_gb = var.preemptible_disk_size_gb
+    disk_type    = var.preemptible_disk_type
 
     metadata = {
       disable-legacy-endpoints = true

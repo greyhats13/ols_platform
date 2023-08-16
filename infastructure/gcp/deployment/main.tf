@@ -52,9 +52,13 @@ module "gke" {
   gke_oauth_scopes                  = ["https://www.googleapis.com/auth/cloud-platform"]
   ondemand_node_count               = 2
   ondemand_machine_type             = "e2-medium"
+  ondemand_disk_size_gb             = 20
+  ondemand_disk_type                = "pd-standard"
   ondemand_tags                     = ["ondemand"]
   ondemand_oauth_scopes             = ["https://www.googleapis.com/auth/logging.write", "https://www.googleapis.com/auth/monitoring"]
   preemptible_machine_type          = "e2-medium"
+  preemptible_disk_size_gb          = 20
+  preemptible_disk_type             = "pd-standard"
   preemptible_tags                  = ["preemptible"]
   preemptible_oauth_scopes          = ["https://www.googleapis.com/auth/logging.write", "https://www.googleapis.com/auth/monitoring"]
   preemptible_min_node_count        = 0
