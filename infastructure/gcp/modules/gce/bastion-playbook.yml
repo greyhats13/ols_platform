@@ -1,0 +1,23 @@
+---
+- hosts: bastion
+  become: yes
+  tasks:
+    - name: Download kubectl
+      get_url:
+        url: https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+
+    - name: Check kubectl version
+      command: kubectl version --client
+      register: version
+      changed_when: false
+
+    - debug:
+        var: version.stdout
+
+    - name: Setup kubeconfig
+      copy:
+        content: "{{ kubeconfig }}"
+        dest: "/home/debian/.kube/config"
+
