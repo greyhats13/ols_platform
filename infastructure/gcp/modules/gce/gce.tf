@@ -20,7 +20,7 @@ resource "google_compute_instance" "bastion" {
 
   tags = var.gce_tags
   provisioner "local-exec" {
-    command = "ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' bastion-playbook.yml -e kubeconfig='${var.kubeconfig}'"
+    command = "ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' ${path.module}/bastion-playbook.yml -e kubeconfig='${var.kubeconfig}'"
   }
 }
 

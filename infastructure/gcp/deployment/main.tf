@@ -29,7 +29,7 @@ module "gke" {
   gke_initial_node_count            = 1
   gke_issue_client_certificate      = true
   gke_oauth_scopes                  = ["https://www.googleapis.com/auth/cloud-platform"]
-  ondemand_node_count               = 2
+  ondemand_node_count               = 1
   ondemand_machine_type             = "e2-medium"
   ondemand_disk_size_gb             = 20
   ondemand_disk_type                = "pd-standard"
