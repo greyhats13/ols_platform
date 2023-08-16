@@ -1,5 +1,5 @@
 # Local .terraform directories
-vault-password.txt
+*.pem
 **/.terraform/*
 .terraform.lock.hcl
 # .tfstate files

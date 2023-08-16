@@ -1,5 +1,5 @@
 ---
-- hosts: bastion
+- hosts: all
   become: yes
   tasks:
     - name: Download kubectl
