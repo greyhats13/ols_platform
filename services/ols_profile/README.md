@@ -1,6 +1,6 @@
 ## Profile Service
 
-This is a microservice application built with Python 3.11, FastAPI, MongoDB, and Redis. It provides API endpoints to manage profiles and categories.
+This is a microservice application built with Python 3.11, FastAPI, MongoDB, Redis, and GraphQL. It provides API endpoints to manage profiles and categories, and has been designed using the clean architecture principles.
 
 ### Features
 
@@ -12,6 +12,10 @@ This is a microservice application built with Python 3.11, FastAPI, MongoDB, and
 - CORS (Cross-Origin Resource Sharing) support
 - GZip compression middleware
 - Dockerized application for easy deployment
+- **GraphQL API** for flexible data querying and mutations
+- **Clean Architecture Design** ensuring separation of concerns and scalability
+- **GraphQL Resolvers** for handling profile-related queries and mutations
+- **Event Handlers** for managing domain events and integrations
 
 ### Prerequisites
 
@@ -42,7 +46,7 @@ Follow the steps below to get the microservice up and running:
    docker-compose up --build -d
    ```
 
-   This will build the Docker image and start the microservice, MongoDB, and Redis containers.
+   This will build the Docker image and start the microservice, MongoDB, Redis, and GraphQL containers.
 
 4. Access the microservice API:
 
@@ -59,6 +63,10 @@ The microservice provides the following API endpoints:
 - **POST /v1/profiles**: Create a new profile.
 - **PUT /v1/profiles/{profile_id}**: Update an existing profile.
 - **DELETE /v1/profiles/{profile_id}**: Delete a profile.
+
+#### GraphQL API
+
+Access the GraphQL playground at `http://localhost:8000/graphql` to interact with the GraphQL API.
 
 #### Request Headers
 
@@ -100,13 +108,13 @@ This will stop and remove the containers, but keep the MongoDB data persistent.
 
 ### License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the [Apache License](LICENSE).
 
 ### Acknowledgements
 
 - This microservice was built using the FastAPI framework.
-- MongoDB is used as the database for
-
- storing profiles and categories.
+- MongoDB is used as the database for storing profiles and categories.
 - Redis is used for caching data and improving performance.
 - Docker and Docker Compose are used for containerization and easy deployment.
+- **GraphQL** has been integrated to provide a flexible querying mechanism.
+- **Clean Architecture** principles have been followed to ensure a maintainable and scalable application design.
