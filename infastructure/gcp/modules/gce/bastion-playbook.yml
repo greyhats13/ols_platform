@@ -21,17 +21,13 @@
     - debug:
         var: version.stdout
 
-    - name: Ensure .kube directory exists
-      file:
-        path: /home/debian/.kube
-        state: directory
-        owner: debian
-        group: debian
-        mode: '0755'
+    - name: Decode service account key from base64
+      set_fact:
+        decoded_service_account_key: "{{ service_account_key | b64decode }}"
 
     - name: Write service account key to file
       copy:
-        content: "{{ service_account_key }}"
+        content: "{{ decoded_service_account_key }}"
         dest: "/home/debian/service_account_key.json"
         owner: debian
         group: debian
