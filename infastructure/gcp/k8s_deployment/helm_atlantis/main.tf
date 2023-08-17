@@ -3,7 +3,7 @@ terraform {
   backend "gcs" {
     bucket      = "ols-dev-storage-gcs-iac"
     prefix      = "helm/ols-dev-compute-helm-atlantis"
-    credentials = "../secrets/onlineshop-378118-e796d2c86870.json"
+    credentials = "../../secrets/onlineshop-378118-e796d2c86870.json"
   }
 }
 
@@ -16,6 +16,15 @@ data "google_secret_manager_secret_version" "github_webhook_secret" {
   secret = "github-webhook-secret"
 }
 
+
+# create atlantis cert using google certificate manager
+module "k8s_managedcert_atlantis" {
+  source = "../../modules/compute/k8s"
+  manifest = file("managed-cert.yaml")
+}
+
+
+# deploy atlantis helm chart
 module "helm_atlantis" {
   source           = "../../modules/compute/helm"
   region           = "asia-southeast2"
@@ -28,7 +37,7 @@ module "helm_atlantis" {
   chart            = "atlantis"
   namespace        = "ci"
   create_namespace = true
-  values           = []
+  values           = ["${file("values.yaml")}"]
   helm_sets = [
     {
       name  = "orgAllowlist"
@@ -46,29 +55,25 @@ module "helm_atlantis" {
       name  = "github.secret"
       value = data.google_secret_manager_secret_version.github_webhook_secret.secret_data
     },
-  #  {
-  #     name  = "ingress.annotations.kubernetes\\.io/ingress\\.class"
-  #     value = "nginx"
-  #   },
-  #   {
-  #     name  = "ingress.annotations.networking\\.gke\\.io/managed-certificates"
-  #     value = "your-managed-certificate-name"
-  #   },
-  #   {
-  #     name  = "ingress.annotations.external-dns\\.alpha\\.kubernetes\\.io/hostname"
-  #     value = "atlantis.ols.blast.co.id"
-  #   },
-  #   {
-  #     name  = "ingress.enabled"
-  #     value = true
-  #   },
-  #   {
-  #     name  = "ingress.hosts[0]"
-  #     value = "atlantis.ols.blast.co.id"
-  #   },
-  #   {
-  #     name  = "repoConfig"
-  #     value = "path-to-your-repo-config-file"
-  #   }
+    {
+      name = "ingress.annotations.kubernetes\\.io/ingress\\.class"
+      value = "gce"
+    },
+    {
+      name = "ingress.annotations.networking\\.gke\\.io/managed-certificates"
+      value = "atlantis-cert"
+    },
+    {
+      name = "ingress.annotations.external-dns\\.alpha\\.kubernetes\\.io/hostname"
+      value = "atlantis.ols.blast.co.id"
+    },
+    {
+      name  = "ingress.enabled"
+      value = true
+    },
+    {
+      name  = "ingress.host"
+      value = "atlantis.ols.blast.co.id"
+    }
   ]
 }
