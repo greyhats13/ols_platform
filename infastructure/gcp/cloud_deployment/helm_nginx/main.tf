@@ -38,9 +38,7 @@ module "helm" {
     {
       name  = "controller.image.tag"
       value = "v1.8.1"
-    },
-    #set ingress class
-    
+    }
   ]
   namespace        = "ingress"
   create_namespace = true
