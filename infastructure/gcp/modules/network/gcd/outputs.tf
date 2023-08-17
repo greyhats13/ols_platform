@@ -11,3 +11,7 @@ output "gcd_managed_zone_id" {
 output "gcd_name_servers" {
   value = google_dns_managed_zone.gcd.name_servers
 }
+
+output "gcd_zone_visibility" {
+  value = google_dns_managed_zone.gcd.visibility
+}

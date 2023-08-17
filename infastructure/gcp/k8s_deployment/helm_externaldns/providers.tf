@@ -5,8 +5,15 @@ data "terraform_remote_state" "gke_cluster" {
   config = {
     bucket      = "ols-dev-storage-gcs-iac"
     prefix      = "gke/ols-dev-compute-gke"
-    credentials = "../secrets/onlineshop-378118-e796d2c86870.json"
+    credentials = "../../secrets/onlineshop-378118-e796d2c86870.json"
   }
+}
+
+# create gcp provider
+provider "google" {
+  credentials = file("../../secrets/onlineshop-378118-e796d2c86870.json")
+  project     = "onlineshop-378118"
+  region      = "asia-southeast2"
 }
 
 # create provider for helm and get credential from gke cluster

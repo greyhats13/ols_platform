@@ -11,3 +11,7 @@ output "network_gcd_managed_zone_id" {
 output "network_gcd_name_servers" {
   value = module.gcd_blast.gcd_name_servers
 }
+
+output "network_gcd_zone_visibility" {
+  value = module.gcd_blast.gcd_zone_visibility
+}
