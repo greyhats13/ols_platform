@@ -16,7 +16,13 @@ resource "google_container_cluster" "cluster" {
 
   remove_default_node_pool = var.gke_remove_default_node_pool
   initial_node_count       = var.gke_initial_node_count
-
+  node_config {
+    machine_type = var.default_machine_type
+    disk_size_gb = var.default_disk_size_gb
+    disk_type    = var.default_disk_type
+      service_account = var.service_account
+      oauth_scopes = var.gke_oauth_scopes
+    }
   master_auth {
     client_certificate_config {
       issue_client_certificate = var.gke_issue_client_certificate
@@ -68,6 +74,7 @@ resource "google_container_node_pool" "preemptible" {
     machine_type = var.preemptible_machine_type
     disk_size_gb = var.preemptible_disk_size_gb
     disk_type    = var.preemptible_disk_type
+    service_account = var.service_account
 
     metadata = {
       disable-legacy-endpoints = true
@@ -82,8 +89,43 @@ resource "google_container_node_pool" "preemptible" {
     min_node_count = var.preemptible_min_node_count
     max_node_count = var.preemptible_max_node_count
   }
-  depends_on = [
-    google_container_cluster.cluster
-  ]
+}
+
+#solving bug from: https://github.com/hashicorp/terraform-provider-kubernetes/issues/1424
+
+data "google_client_config" "current" {}
+
+provider "kubernetes" {
+  host                   = "https://${google_container_cluster.cluster.endpoint}"
+  token                  = data.google_client_config.current.access_token
+  cluster_ca_certificate = base64decode(google_container_cluster.cluster.master_auth.0.cluster_ca_certificate)
+}
+
+resource "kubernetes_cluster_role_binding" "client_cluster_admin" {
+  metadata {
+    annotations = {}
+    labels      = {}
+    name        = "client-cluster-admin"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind = "ClusterRole"
+    name = "cluster-admin"
+  }
+  subject {
+    kind = "User"
+    name = "client"
+    api_group = "rbac.authorization.k8s.io"
+  }
+  subject {
+    kind = "ServiceAccount"
+    name = "default"
+    namespace = "kube-system"
+  }
+  subject {
+    kind = "Group"
+    name = "system:masters"
+    api_group = "rbac.authorization.k8s.io"
+  }
 }
 

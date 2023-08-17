@@ -45,6 +45,26 @@ variable "gke_oauth_scopes" {
   description = "oauth scopes"
 }
 
+variable "default_machine_type" {
+  type        = string
+  description = "the machine type to use"
+}
+
+variable "default_disk_size_gb" {
+  type        = number
+  description = "disk size"
+}
+
+variable "default_disk_type" {
+  type        = string
+  description = "disk type"
+}
+
+variable "service_account" {
+  type        = string
+  description = "service account"
+}
+
 # gke ondemand node pool arguments
 # variable "ondemand_nodepool_name" {
 #   type        = string

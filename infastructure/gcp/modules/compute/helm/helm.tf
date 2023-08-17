@@ -1,5 +1,5 @@
 resource "helm_release" "helm" {
-  name       = "${var.unit}-${var.env}-${var.code}-${var.feature}"
+  name       = "${var.unit}-${var.release_name}"
   repository = var.repository
   chart      = var.chart
   values     = length(var.values) > 0 ? var.values : []
@@ -14,4 +14,5 @@ resource "helm_release" "helm" {
       value = set.value.value
     }
   }
+  create_namespace = var.create_namespace
 }

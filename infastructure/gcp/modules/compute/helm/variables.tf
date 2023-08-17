@@ -25,6 +25,11 @@ variable "feature" {
 }
 
 # helm arguments
+variable "release_name" {
+  type        = string
+  description = "helm release name"
+  default     = "helm"
+}
 
 variable "repository" {
   type        = string
@@ -45,9 +50,17 @@ variable "values" {
 variable "namespace" {
   type        = string
   description = "helm namespace"
+  default     = "default"
+}
+
+variable "create_namespace" {
+  type        = bool
+  description = "helm create namespace"
+  default     = false
 }
 
 variable "helm_sets" {
   type        = list(object({ name : string, value : any }))
   description = "list of helm set"
+  default = []
 }
