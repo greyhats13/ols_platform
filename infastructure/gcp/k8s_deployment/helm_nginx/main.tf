@@ -33,7 +33,7 @@ module "helm" {
     },
     {
       name  = "controller.autoscaling.maxReplicas"
-      value = 2
+      value = 3
     },
     {
       name  = "controller.image.tag"
