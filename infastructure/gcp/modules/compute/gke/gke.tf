@@ -59,7 +59,7 @@ resource "google_container_cluster" "cluster" {
 # create a preemptible node pool
 resource "google_container_node_pool" "preemptible" {
   name       = var.preemptible_nodepool_name
-  location   = var.region
+  location = "${var.region}-a"
   cluster    = google_container_cluster.cluster.name
   node_count = 0
 
@@ -82,5 +82,8 @@ resource "google_container_node_pool" "preemptible" {
     min_node_count = var.preemptible_min_node_count
     max_node_count = var.preemptible_max_node_count
   }
+  depends_on = [
+    google_container_cluster.cluster
+  ]
 }
 

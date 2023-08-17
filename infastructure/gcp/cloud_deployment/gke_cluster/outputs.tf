@@ -18,6 +18,7 @@ output "gke_cluster_client_certificate" {
 
 output "gke_cluster_client_key" {
   value = module.gke.cluster_client_key
+  sensitive = true
 }
 
 output "gke_cluster_ca_certificate" {
