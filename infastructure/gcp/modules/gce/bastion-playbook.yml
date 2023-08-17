@@ -29,10 +29,25 @@
         group: debian
         mode: '0755'
 
-    - name: Setup kubeconfig
+    - name: Write service account key to file
       copy:
-        content: "{{ kubeconfig }}"
-        dest: "/home/debian/.kube/config"
+        content: "{{ service_account_key }}"
+        dest: "/home/debian/service_account_key.json"
         owner: debian
         group: debian
         mode: '0644'
+
+    - name: Set GCP project
+      command:
+        cmd: gcloud config set project {{ project_id }}
+      become: no
+
+    - name: Authenticate using service account
+      command:
+        cmd: gcloud auth activate-service-account --key-file=/home/debian/service_account_key.json
+      become: no
+
+    - name: Get GKE cluster credentials to generate kubeconfig
+      command:
+        cmd: gcloud container clusters get-credentials {{ cluster_name }} --region {{ region }}
+      become: no

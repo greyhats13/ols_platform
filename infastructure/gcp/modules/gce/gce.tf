@@ -4,10 +4,35 @@ resource "tls_private_key" "tls" {
   rsa_bits  = 2048
 }
 
+# create private key file
 resource "local_file" "private_key" {
-  content  = tls_private_key.tls.private_key_pem
-  filename = "private_key.pem"
+  content         = tls_private_key.tls.private_key_pem
+  filename        = "private_key.pem"
   file_permission = "0400"
+}
+
+data "google_project" "current" {}
+
+locals {
+  project_id = data.google_project.current.project_id
+}
+
+# create bastion service account
+resource "google_service_account" "bastion_sa" {
+  account_id   = "${var.unit}-${var.env}-${var.code}-${var.feature[0]}-bastion"
+  display_name = "Service Account for Bastion Host"
+}
+
+resource "google_service_account_key" "bastion_sa_key" {
+  service_account_id = google_service_account.bastion_sa.name
+  public_key_type    = "TYPE_X509_PEM_FILE"
+}
+
+# create bastion gke admin role
+resource "google_project_iam_member" "bastion_gke_admin" {
+  project = local.project_id
+  role    = "roles/container.admin"
+  member  = "serviceAccount:${google_service_account.bastion_sa.email}"
 }
 
 # Bastion host
@@ -18,8 +43,8 @@ resource "google_compute_instance" "bastion" {
 
   boot_disk {
     initialize_params {
-      type = var.gce_disk_type
-      size = var.gce_disk_size
+      type  = var.gce_disk_type
+      size  = var.gce_disk_size
       image = var.gce_image
     }
   }
@@ -34,10 +59,15 @@ resource "google_compute_instance" "bastion" {
     ssh-keys = "debian:${tls_private_key.tls.public_key_openssh}"
   }
 
+  service_account {
+    email  = google_service_account.bastion_sa.email
+    scopes = ["cloud-platform"]
+  }
+
   tags = var.gce_tags
   provisioner "local-exec" {
-    #multiple line command
-    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' -u debian --private-key=private_key.pem '${path.module}'/bastion-playbook.yml -e kubeconfig='${var.kubeconfig}'"
+    #command for ansible playbook
+    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' -u debian --private-key=private_key.pem '${path.module}'/bastion-playbook.yml -e service_account_key='${google_service_account_key.bastion_sa_key.private_key}' -e project_id='${local.project_id}'  -e cluster_name='${var.cluster_name}' -e region='${var.region}'"
   }
 }
 

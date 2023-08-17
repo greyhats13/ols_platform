@@ -64,5 +64,5 @@ module "bastion" {
   gcf_ports         = ["22"]
   gcf_source_ranges = ["0.0.0.0/0"]
   gcf_target_tags   = ["bastion"]
-  kubeconfig        = module.gke.kubeconfig
+  cluster_name      = module.gke.cluster_name
 }

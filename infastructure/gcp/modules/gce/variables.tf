@@ -81,7 +81,7 @@ variable "gcf_target_tags" {
   description = "the gcf firewall target tags to use"
 }
 
-variable "kubeconfig" {
-  description = "Kubeconfig content from GKE cluster"
+variable "cluster_name" {
   type        = string
+  description = "GKE cluster name"
 }
