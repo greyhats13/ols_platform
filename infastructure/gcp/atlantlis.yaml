@@ -17,10 +17,6 @@ projects:
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: cloud_deployment/helm_nginx
-    apply_requirements: ["approved", "mergeable"]
-    autoplan:
-      when_modified: ["*.tf*"]
   - dir: cloud_deployment/gsm_github_token
     apply_requirements: ["approved", "mergeable"]
     autoplan:
@@ -33,7 +29,11 @@ projects:
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: k8s_deployment/gce_bastion
+  - dir: cloud_deployment/gce_bastion
+    apply_requirements: ["approved", "mergeable"]
+    autoplan:
+      when_modified: ["*.tf*"]
+  - dir: k8s_deployment/helm_nginx
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
