@@ -20,7 +20,7 @@ variable "code" {
 }
 
 variable "feature" {
-  type        = list(string)
+  type        = string
   description = "the name of AWS services feature"
 }
 
@@ -46,38 +46,47 @@ variable "gke_oauth_scopes" {
 }
 
 # gke ondemand node pool arguments
+# variable "ondemand_nodepool_name" {
+#   type        = string
+#   description = "node pool name"
+# }
 
-variable "ondemand_node_count" {
-  type        = number
-  description = "node count"
-}
+# variable "ondemand_node_count" {
+#   type        = number
+#   description = "node count"
+# }
 
-variable "ondemand_machine_type" {
-  type        = string
-  description = "the machine type to use"
-}
+# variable "ondemand_machine_type" {
+#   type        = string
+#   description = "the machine type to use"
+# }
 
-variable "ondemand_disk_size_gb" {
-  type        = number
-  description = "disk size"
-}
+# variable "ondemand_disk_size_gb" {
+#   type        = number
+#   description = "disk size"
+# }
 
-variable "ondemand_disk_type" {
-  type        = string
-  description = "disk type"
-}
+# variable "ondemand_disk_type" {
+#   type        = string
+#   description = "disk type"
+# }
 
-variable "ondemand_oauth_scopes" {
-  type        = list(string)
-  description = "oauth scopes"
-}
+# variable "ondemand_oauth_scopes" {
+#   type        = list(string)
+#   description = "oauth scopes"
+# }
 
-variable "ondemand_tags" {
-  type        = list(string)
-  description = "the tag to use"
-}
+# variable "ondemand_tags" {
+#   type        = list(string)
+#   description = "the tag to use"
+# }
 
 # gke preemptible node pool arguments
+
+variable "preemptible_nodepool_name" {
+  type        = string
+  description = "node pool name"
+}
 variable "preemptible_machine_type" {
   type        = string
   description = "the machine type to use"
@@ -111,17 +120,6 @@ variable "preemptible_min_node_count" {
 variable "preemptible_max_node_count" {
   type        = number
   description = "max node count"
-}
-
-# network arguments
-variable "network_self_link" {
-  type        = string
-  description = "the network self link to use"
-}
-
-variable "subnet_self_link" {
-  type        = string
-  description = "the subnet self link to use"
 }
 
 variable "gke_pods_secondary_range_name" {
