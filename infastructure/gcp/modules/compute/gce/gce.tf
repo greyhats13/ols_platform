@@ -18,13 +18,13 @@ locals {
 }
 
 # create bastion service account
-resource "google_service_account" "bastion_sa" {
+resource "google_service_account" "sa" {
   account_id   = "${var.unit}-${var.env}-${var.code}-${var.feature[0]}-bastion"
   display_name = "Service Account for Bastion Host"
 }
 
-resource "google_service_account_key" "bastion_sa_key" {
-  service_account_id = google_service_account.bastion_sa.name
+resource "google_service_account_key" "sa_key" {
+  service_account_id = google_service_account.sa.name
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
 
@@ -32,7 +32,7 @@ resource "google_service_account_key" "bastion_sa_key" {
 resource "google_project_iam_member" "bastion_gke_admin" {
   project = local.project_id
   role    = "roles/container.admin"
-  member  = "serviceAccount:${google_service_account.bastion_sa.email}"
+  member  = "serviceAccount:${google_service_account.sa.email}"
 }
 
 # Bastion host
@@ -60,15 +60,15 @@ resource "google_compute_instance" "bastion" {
   }
 
   service_account {
-    email  = google_service_account.bastion_sa.email
+    email  = google_service_account.sa.email
     scopes = ["cloud-platform"]
   }
 
   tags = var.gce_tags
-  provisioner "local-exec" {
-    #command for ansible playbook
-    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' -u debian --private-key=private_key.pem '${path.module}'/bastion-playbook.yml -e service_account_key='${google_service_account_key.bastion_sa_key.private_key}' -e project_id='${local.project_id}'  -e cluster_name='${var.cluster_name}' -e region='${var.region}'"
-  }
+  # provisioner "local-exec" {
+  #   #command for ansible playbook
+  #   command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${self.network_interface.0.access_config.0.nat_ip},' -u debian --private-key=private_key.pem '${path.module}'/playbook.yml -e service_account_key='${google_service_account_key.sa_key.private_key}' -e project_id='${local.project_id}'  -e cluster_name='${var.cluster_name}' -e region='${var.region}'"
+  # }
 }
 
 # Firewall rule buat allow SSH ke bastion host

@@ -20,32 +20,22 @@ variable "code" {
 }
 
 variable "feature" {
-  type        = list(string)
+  type        = string
   description = "the name of AWS services feature"
 }
 
 # subnet arguments
-variable "subnetwork_ip_cidr_range" {
+variable "bucket_name" {
   type        = string
-  description = "the subnetwork ip cidr range to use"
+  description = "the bucket name to use"
 }
 
-variable "pods_range_name" {
-  type = string
-  description = "the pods range name"
+variable "force_destroy" {
+  type        = bool
+  description = "set to true to destroy all objects in the bucket when destroying bucket"
 }
 
-variable "services_range_name" {
-  type = string
-  description = "the services range name"
-}
-
-variable "pods_ip_cidr_range" {
+variable "public_access_prevention" {
   type        = string
-  description = "IP CIDR range for GKE pods"
-}
-
-variable "services_ip_cidr_range" {
-  type        = string
-  description = "IP CIDR range for GKE services"
+  description = "set to true to prevent public access to the bucket"
 }

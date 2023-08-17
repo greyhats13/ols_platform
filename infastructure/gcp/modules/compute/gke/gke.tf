@@ -1,7 +1,7 @@
 # create a GKE cluster with 2 node pools
 resource "google_container_cluster" "cluster" {
   name     = "${var.unit}-${var.env}-${var.code}-${var.feature[0]}"
-  location = var.region
+  location = "${var.region}-a"
 
   remove_default_node_pool = var.gke_remove_default_node_pool
   initial_node_count       = var.gke_initial_node_count
