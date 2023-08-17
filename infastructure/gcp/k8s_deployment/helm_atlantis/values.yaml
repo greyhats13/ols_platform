@@ -1,7 +1,7 @@
 repoConfig: |
  ---
  repos:
- - id: github.com/greyhats13/ol_shop
+ - id: /.*/
    branch: /.*/
    repo_config_file: infrastructure/gcp/atlantis.yaml
    plan_requirements: []

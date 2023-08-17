@@ -41,7 +41,7 @@ module "helm_atlantis" {
   helm_sets = [
     {
       name  = "orgAllowlist"
-      value = "github.com/greyhats13"
+      value = "github.com/greyhats13/*"
     },
     {
       name  = "github.user"
