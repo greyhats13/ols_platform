@@ -1,3 +1,4 @@
+# Configure the backend for Terraform state storage
 terraform {
   backend "gcs" {
     bucket = "ols-dev-gcloud-storage-tfstate"
@@ -5,6 +6,7 @@ terraform {
   }
 }
 
+# Deploy the VPC using the VPC module
 module "vpc" {
   source                             = "../../modules/network/vpc"
   region                             = "asia-southeast2"
