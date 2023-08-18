@@ -11,7 +11,7 @@ module "vpc" {
   unit                               = "ols"
   env                                = "dev"
   code                               = "vpc"
-  feature                            = ["network", "subnet", "router", "address", "nat", "route"]
+  feature                            = ["network", "subnet", "router", "address", "nat"]
   pods_range_name                    = "pods-range"
   services_range_name                = "services-range"
   nat_ip_allocate_option             = "AUTO_ONLY"

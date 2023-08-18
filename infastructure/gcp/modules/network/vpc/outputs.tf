@@ -44,18 +44,3 @@ output "nat_id" {
   value       = google_compute_router_nat.nat.id
   description = "The ID of the NAT being created."
 }
-
-output "route_id" {
-  value       = google_compute_route.route_igw.id
-  description = "The ID of the route being created."
-}
-
-output "route_next_hop_gateway" {
-  value       = google_compute_route.route_igw.next_hop_gateway
-  description = "The next hop to the destination network."
-}
-
-output "route_self_link" {
-  value       = google_compute_route.route_igw.self_link
-  description = "The URI of the route being created."
-}

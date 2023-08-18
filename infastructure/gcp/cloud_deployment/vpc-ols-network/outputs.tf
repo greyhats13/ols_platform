@@ -36,16 +36,3 @@ output "router_self_link" {
 output "nat_id" {
   value = module.vpc.nat_id
 }
-
-#route
-output "route_id" {
-  value = module.vpc.route_id
-}
-
-output "route_next_hop_gateway" {
-  value = module.vpc.route_next_hop_gateway
-}
-
-output "route_self_link" {
-  value = module.vpc.route_self_link
-}

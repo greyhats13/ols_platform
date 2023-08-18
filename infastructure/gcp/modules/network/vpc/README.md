@@ -3,15 +3,13 @@
 
 # Google Cloud VPC Terraform Module
 
-This module provides Terraform configurations for creating a VPC in Google Cloud Platform (GCP) with the necessary configurations for GKE clusters. It sets up a VPC, subnetwork, router, Cloud NAT, and custom routes.
-
+This module provides Terraform configurations for creating a VPC in Google Cloud Platform (GCP) with the necessary configurations for GKE clusters. It sets up a VPC, subnetwork, router, and Cloud NAT.
 ## Overview
 
 - Creates a VPC in GCP.
 - Configures a subnetwork within the VPC with CIDR ranges that vary based on the environment (`var.env`).
 - Sets up a router for the VPC.
 - Configures Cloud NAT for the VPC.
-- Creates custom routes to internet gateway for the VPC.
 
 ## Usage
 
@@ -63,8 +61,5 @@ module "vpc" {
 | router_id | The ID of the router being created. |
 | router_self_link | The URI of the router being created. |
 | nat_id | The ID of the NAT being created. |
-| route_id | The ID of the route being created. |
-| route_next_hop_gateway | The next hop to the destination network. |
-| route_self_link | The URI of the route being created. |
 
 ---

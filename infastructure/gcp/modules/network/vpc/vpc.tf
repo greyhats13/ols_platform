@@ -3,7 +3,6 @@
 resource "google_compute_network" "vpc" {
   name                    = "${var.unit}-${var.env}-${var.code}-${var.feature[0]}"
   auto_create_subnetworks = false  # Disable default subnets creation for more granular control
-  delete_default_routes_on_create = true  # Remove GCP's default routes for full control over routing
 }
 
 # Create a Google Compute Subnetwork within the VPC
@@ -65,14 +64,4 @@ resource "google_compute_router_nat" "nat" {
       source_ip_ranges_to_nat = subnetwork.value.source_ip_ranges_to_nat
     }
   }
-}
-
-# Create a custom route to default internet gateway
-# This route ensures that traffic from the VPC can reach the internet.
-resource "google_compute_route" "route_igw" {
-  name                  = "${var.unit}-${var.env}-${var.code}-${var.feature[5]}-igw"
-  network               = google_compute_network.vpc.name
-  dest_range            = "0.0.0.0/0"
-  next_hop_gateway      = "global/gateways/default-internet-gateway"
-  priority              = 1000
 }
