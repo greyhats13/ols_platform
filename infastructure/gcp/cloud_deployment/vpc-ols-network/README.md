@@ -51,6 +51,26 @@ provider "google" {
 }
 ```
 
+#### Authenticating with Google Cloud
+
+To authenticate with Google Cloud, you can use one of the following methods:
+
+1. **Service Account JSON Key**: Provide the path to the JSON key file of the service account.
+   ```hcl
+   provider "google" {
+     credentials = file("<PATH_TO_SERVICE_ACCOUNT_JSON_KEY>")
+     project     = "onlineshop-378118"
+     region      = "asia-southeast2"
+   }
+   ```
+
+2. **Environment Variable**: Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the path of your service account JSON key.
+   ```bash
+   export GOOGLE_APPLICATION_CREDENTIALS="<PATH_TO_SERVICE_ACCOUNT_JSON_KEY>"
+   ```
+
+3. **Default Credentials**: If you're running Terraform on a GCP environment (like a Compute Engine instance), it can use the default service account associated with the instance or environment.
+
 ## Outputs
 
 | Name                 | Description                                          |
