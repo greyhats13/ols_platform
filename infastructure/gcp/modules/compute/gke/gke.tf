@@ -3,9 +3,8 @@ data "terraform_remote_state" "ols_network" {
   backend = "gcs"
 
   config = {
-    bucket      = "${var.unit}-${var.env}-storage-gcs-iac"
+    bucket      = "${var.unit}-${var.env}-storage-gcloud-storage-tfstate"
     prefix      = "vpc/${var.unit}-${var.env}-network-vpc"
-    credentials = "../../secrets/onlineshop-378118-e796d2c86870.json"
   }
 }
 

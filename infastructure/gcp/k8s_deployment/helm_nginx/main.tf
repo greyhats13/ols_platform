@@ -1,7 +1,7 @@
 # Terraform State Storage
 terraform {
   backend "gcs" {
-    bucket      = "ols-dev-storage-gcs-iac"
+    bucket      = "ols-dev-gcloud-storage-tfstate"
     prefix      = "helm/ols-dev-compute-helm-nginx"
     # credentials = "../../secrets/onlineshop-378118-e796d2c86870.json"
   }

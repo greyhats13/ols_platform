@@ -1,9 +1,8 @@
 # Terraform State Storage
 terraform {
   backend "gcs" {
-    bucket      = "ols-dev-storage-gcs-iac"
+    bucket      = "ols-dev-gcloud-storage-tfstate"
     prefix      = "helm/ols-dev-compute-helm-externaldns"
-    credentials = "../../secrets/onlineshop-378118-e796d2c86870.json"
   }
 }
 
@@ -14,9 +13,8 @@ data "terraform_remote_state" "ols_dns" {
   backend = "gcs"
 
   config = {
-    bucket      = "ols-dev-storage-gcs-iac"
+    bucket      = "ols-dev-gcloud-storage-tfstate"
     prefix      = "gcd/ols-dev-network-gcd"
-    credentials = "../../secrets/onlineshop-378118-e796d2c86870.json"
   }
 }
 
