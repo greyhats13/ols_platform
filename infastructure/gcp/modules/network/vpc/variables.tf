@@ -1,56 +1,56 @@
 #Naming Standard
 variable "region" {
   type        = string
-  description = "GCP region"
+  description = "The GCP region where resources will be created."
 }
 
 variable "unit" {
   type        = string
-  description = "business unit code"
+  description = "Business unit code."
 }
 
 variable "env" {
   type        = string
-  description = "stage environment where the infrastructure will be deployed"
+  description = "Stage environment where the infrastructure will be deployed."
 }
 
 variable "code" {
   type        = string
-  description = "service domain code to use"
+  description = "Service domain code."
 }
 
 variable "feature" {
-  type        = string
-  description = "the name of AWS services feature"
+  type        = list(string)
+  description = "Feature names"
 }
 
 # subnet arguments
-variable "subnet_name" {
-  type        = string
-  description = "the subnet name to use"
-}
-
-variable "subnetwork_ip_cidr_range" {
-  type        = string
-  description = "the subnetwork ip cidr range to use"
-}
-
 variable "pods_range_name" {
-  type = string
-  description = "the pods range name"
+  type        = string
+  description = "The name of the pods range."
 }
 
 variable "services_range_name" {
-  type = string
-  description = "the services range name"
+  type        = string
+  description = "The name of the services range."
 }
 
-variable "pods_ip_cidr_range" {
+# router arguments
+variable "nat_ip_allocate_option" {
   type        = string
-  description = "IP CIDR range for GKE pods"
+  description = "The way NAT IPs should be allocated. Valid values are AUTO_ONLY, MANUAL_ONLY or AUTO_ONLY."
 }
 
-variable "services_ip_cidr_range" {
+variable "source_subnetwork_ip_ranges_to_nat" {
   type        = string
-  description = "IP CIDR range for GKE services"
+  description = "The way NAT IPs should be allocated. Valid values are LIST_OF_SUBNETWORKS or ALL_SUBNETWORKS_ALL_IP_RANGES."
+}
+
+variable "subnetworks" {
+  type        = list(object({
+    name                     = string
+    source_ip_ranges_to_nat  = list(string)
+  }))
+  description = "List of subnetworks to configure NAT for."
+  default = []
 }

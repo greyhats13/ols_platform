@@ -2,18 +2,18 @@
 terraform {
   backend "gcs" {
     bucket  = "ols-dev-gcloud-storage-tfstate"
-    prefix  = "gcs/ols-dev-gcloud-storage-tfstate"
+    prefix  = "gcloud-storage/ols-dev-gcloud-storage-tfstate"
   }
 }
 
 // Deploy a Google Cloud Storage bucket using the gcloud-storage module
-module "gcloud-storage-tfstate" {
+module "gcloud_storage" {
   source                   = "../../modules/storage/gcloud-storage"
   region                   = "asia-southeast2"
   unit                     = "ols"
   env                      = "dev"
   code                     = "gcloud-storage"
-  feature                  = "tfstate"
+  feature                  = ["tfstate"]
   force_destroy            = true
   public_access_prevention = "enforced"
 }

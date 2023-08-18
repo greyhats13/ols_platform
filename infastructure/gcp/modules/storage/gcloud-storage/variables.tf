@@ -20,7 +20,7 @@ variable "code" {
 }
 
 variable "feature" {
-  type        = string
+  type        = list(string)
   description = "The features feature."
 }
 

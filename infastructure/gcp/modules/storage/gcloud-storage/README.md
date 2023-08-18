@@ -29,7 +29,7 @@ module "gcloud-storage-tfstate" {
   region                   = "<GCP Region>"
   unit                     = "<Business Unit Code>"
   env                      = "<Environment>"
-  code                     = "<Service Domain Code>"
+  code                     = "gcloud-storage"
   feature                  = "<Feature Name>"
   force_destroy            = true
   public_access_prevention = "enforced"
@@ -44,7 +44,7 @@ module "gcloud-storage-tfstate" {
 | unit                      | Business unit code.                                           | string | -       | Yes      |
 | env                       | The stage environment where the infrastructure will be deployed. | string | -       | Yes      |
 | code                      | Service domain code.                                          | string | -       | Yes      |
-| feature                   | Service feature name.                                     | string | -       | Yes      |
+| feature                   | Service feature names.                                     | list of string | -       | Yes      |
 | force_destroy             | Delete all objects in the bucket when destroying the bucket.  | bool   | false   | No       |
 | public_access_prevention  | Public access prevention to the bucket ('inherited' or 'enforced'). | string | "inherited" | No |
 

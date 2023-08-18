@@ -1,7 +1,7 @@
 // Google Cloud Storage Bucket Configuration
 resource "google_storage_bucket" "bucket" {
   // Construct bucket name using provided variables
-  name          = "${var.unit}-${var.env}-${var.code}-${var.feature}"
+  name          = "${var.unit}-${var.env}-${var.code}-${var.feature[0]}"
   
   // Set the geographical region for the bucket
   location      = "${var.region}"
