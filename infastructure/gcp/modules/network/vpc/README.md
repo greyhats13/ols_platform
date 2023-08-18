@@ -19,7 +19,7 @@ This module provides Terraform configurations for creating a VPC in Google Cloud
 terraform {
   backend "gcs" {
     bucket  = "<Bucket name for storing tfstate>"
-    prefix  = "<prefix of the bucket>"
+    prefix  = "<prefix of the bucket e.g vpc/ols-dev-vpc-network>"
   }
 }
 
