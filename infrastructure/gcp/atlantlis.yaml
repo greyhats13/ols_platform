@@ -1,39 +1,39 @@
 version: 3
 projects:
-  - dir: cloud_deployment/vpc
+  - dir: cloud-deployment/vpc
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
       enabled: true
-  - dir: cloud_deployment/gcs_iac
+  - dir: cloud-deployment/gcs_iac
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: cloud_deployment/gke_cluster
+  - dir: cloud-deployment/gke_cluster
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: cloud_deployment/gcd_blast
+  - dir: cloud-deployment/gcd_blast
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: cloud_deployment/gsm_github_token
+  - dir: cloud-deployment/gsm_github_token
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: cloud_deployment/gsm_github_webhook_secret
+  - dir: cloud-deployment/gsm_github_webhook_secret
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: k8s_deployment/helm_atlantis
+  - dir: k8s-deployment/helm_atlantis
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: cloud_deployment/gce_bastion
+  - dir: cloud-deployment/gce_bastion
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: k8s_deployment/helm_nginx
+  - dir: k8s-deployment/helm_nginx
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
