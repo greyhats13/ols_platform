@@ -4,8 +4,8 @@ This directory contains Terraform configurations for deploying resources on Goog
 
 ## Modules
 
-## Network
-### 1. **VPC (Virtual Private Cloud)**
+### A. Network
+### A.1. **VPC (Virtual Private Cloud)**
 - **File**: `modules/vpc/vpc.tf`
   - Creates a VPC.
   - Sets up a subnet within the VPC.
@@ -18,7 +18,7 @@ This directory contains Terraform configurations for deploying resources on Goog
   - Provides outputs for VPC ID, VPC self link, VPC gateway IPv4, and subnetwork details.
 
 
-### 2. **Cloud DNS**
+### A.2. **Cloud DNS**
 - **File**: `modules/network/gcloud-dns/cloud-dns.tf`
   - Creates a Cloud DNS zone.
   - Configures the DNS zone with a specific DNS name.
@@ -30,8 +30,8 @@ This directory contains Terraform configurations for deploying resources on Goog
   - Provides outputs for the DNS zone name, DNS zone self link, and DNS zone name servers.
 
 
-## Compute
-### 1. **GCompute Engine**
+## B. Compute
+### B.1. **GCompute Engine**
 - **File**: `modules/compute/gcompute-engine/compute-engine.tf`
   - Sets up a VM.
   - Configures a firewall rule for the VM.
@@ -42,7 +42,7 @@ This directory contains Terraform configurations for deploying resources on Goog
 - **Outputs**: `modules/compute/gcompute-engine/outputs.tf`
 
 
-### 2. **GKubernetes Engine**
+### B.2. **GKubernetes Engine**
 - **File**: `modules/compute/gkubernetes-engine/gkubernetes-engine.tf`
   - Creates a GKE cluster with two node pools: on-demand and preemptible.
   - Configures node pools with specific machine types, tags, and OAuth scopes.
@@ -53,7 +53,7 @@ This directory contains Terraform configurations for deploying resources on Goog
 - **Outputs**: `modules/compute/gkubernetes-engine/outputs.tf`
   - Provides outputs for the GKE cluster name, GKE cluster self link, and GKE cluster endpoint.
 
-### 3. **Helm Chart**
+### B.3. **Helm Chart**
 - **File**: `modules/compute/helm/helm.tf`
   - Deploys a Helm chart to the GKE cluster.
   - Configures the Helm chart with specific values.
@@ -65,8 +65,8 @@ This directory contains Terraform configurations for deploying resources on Goog
   - Provides outputs for the Helm chart name, Helm chart self link, and Helm chart endpoint.
 
 
-## Storage
-### 1. **GCloud Storage**
+## C.Storage
+### C.1. **GCloud Storage**
 - **File**: `modules/storage/gcloud-storage/gcloud-storage.tf`
   - Creates a GCS bucket.
   - Configures the bucket with a specific location and public access prevention.
@@ -77,9 +77,9 @@ This directory contains Terraform configurations for deploying resources on Goog
 - **Outputs**: `modules/storage/gcloud-storage/outputs.tf`
   - Provides outputs for the bucket name, bucket URL, and bucket self link.
 
-## Security
+## D. Security
 
-### 1. **GCertificate Manager**
+### D.1. **GCertificate Manager**
 - **File**: `modules/security/gcertificate-manager/gcertificate-manager.tf`
   - Creates a GCP certificate.
   - Configures the certificate with a specific domain name.
@@ -90,7 +90,7 @@ This directory contains Terraform configurations for deploying resources on Goog
 - **Outputs**: `modules/security/gcertificate-manager/outputs.tf`
   - Provides outputs for the certificate name, certificate self link, and certificate domain name.
 
-### 2. **GSecret Manager**
+### D.2. **GSecret Manager**
 - **File**: `modules/security/gsecret-manager/gsecret-manager.tf`
   - Creates a GCP secret.
   - Configures the secret with a specific secret value.
