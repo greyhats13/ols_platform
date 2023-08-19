@@ -11,6 +11,7 @@ This Terraform module provisions a Virtual Private Cloud (VPC) on GCP, along wit
 - **Subnetwork Creation**: Defines a subnetwork within the VPC with CIDR ranges determined based on the environment (`dev`, `stg`, or `prd`).
 - **Router Creation**: Sets up a router to manage traffic routing and connect the VPC to external networks.
 - **Cloud NAT Creation**: Allows VM instances without external IPs to access the internet. Supports both auto-allocated and manually specified IPs.
+- **Firewall Rule Creation**: Configures firewall rules for the VPC based on provided specifications.
 
 ## Usage
 
@@ -71,6 +72,26 @@ module "vpc" {
       source_ip_ranges_to_nat = ["<Range 1>", "<Range 2>", ...]
     }
   ]
+  vpc_firewall_rules = {
+    <firewall_rule_name> = {
+      name          = "<Firewall Rule Name>"
+      description   = "<Description>"
+      direction     = "<Direction>"
+      allow         = [
+        {
+          protocol = "<Protocol>"
+          ports    = ["<Port Range 1>", "<Port Range 2>", ...]
+        }
+      ]
+      source_ranges = {
+        any    = ["<Any Source Range>"],
+        dev    = ["<Dev Source Range>"],
+        stg    = ["<Stg Source Range>"],
+        prd    = ["<Prd Source Range>"]
+      }
+      priority      = <Priority>
+    }
+  }
 }
 ```
 
@@ -88,6 +109,7 @@ module "vpc" {
 | nat_ip_allocate_option | The way NAT IPs should be allocated. | string | n/a | yes |
 | source_subnetwork_ip_ranges_to_nat | The way NAT IPs should be allocated. | string | n/a | yes |
 | subnetworks | List of subnetworks to configure NAT for. | list(object) | n/a | yes |
+| vpc_firewall_rules | 	Map of firewall rules to be applied to the VPC. | map(object) | `{}` | no |
 
 ## Outputs
 
@@ -104,5 +126,7 @@ module "vpc" {
 | router_id | The ID of the router being created. |
 | router_self_link | The URI of the router being created. |
 | nat_id | The ID of the NAT being created. |
+| firewall_id | The ID of the firewall rule being created. |
+| firewall_self_link | The URI of the firewall rule being created. |
 
 ---
