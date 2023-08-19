@@ -10,23 +10,20 @@ resource "google_compute_network" "vpc" {
 # CIDR ranges are determined based on the environment.
 resource "google_compute_subnetwork" "subnet" {
   name          = "${var.unit}-${var.env}-${var.code}-${var.feature[1]}-${var.region}"
-  ip_cidr_range = var.env == "dev" ? "10.0.0.0/16" : (
-                var.env == "stg" ? "10.1.0.0/16" : "10.2.0.0/16")
+  ip_cidr_range = var.env == "dev" ? var.ip_cidr_range.dev : (
+                var.env == "stg" ? var.ip_cidr_range.stg : var.ip_cidr_range.prd
+              )
   network       = google_compute_network.vpc.self_link  # Link to the VPC created above
 
-  # Define secondary IP range for GKE pods based on the environment
-  secondary_ip_range {
-    range_name    = var.pods_range_name
-    ip_cidr_range = var.env == "dev" ? "172.16.0.0/16" : (
-                  var.env == "stg" ? "172.18.0.0/16" : "172.20.0.0/16")
-  }
-
-  # Define secondary IP range for GKE services based on the environment
-  secondary_ip_range {
-    range_name    = var.services_range_name
-    ip_cidr_range = var.env == "dev" ? "172.17.0.0/16" : (
-                  var.env == "stg" ? "172.19.0.0/16" : "172.21.0.0/16")
-  }
+  dynamic "secondary_ip_range" {
+    for_each = var.env == "dev" ? var.secondary_ip_range.dev : (
+                var.env == "stg" ? var.secondary_ip_range.stg : var.secondary_ip_range.prd
+              )
+    content {
+      range_name    = secondary_ip_range.value.range_name
+      ip_cidr_range = secondary_ip_range.value.ip_cidr_range
+    }
+  } 
 }
 
 # Create a Google Compute Router

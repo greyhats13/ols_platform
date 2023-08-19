@@ -27,6 +27,16 @@ output "subnet_ip_cidr_range" {
   description = "The primary IP CIDR range of the subnetwork."
 }
 
+output "pods_secondary_range_name" {
+  value       = module.vpc.pods_secondary_range_name
+  description = "The name of the secondary IP range for pods."
+}
+
+output "services_secondary_range_name" {
+  value       = module.vpc.services_secondary_range_name
+  description = "The name of the secondary IP range for services."
+}
+
 # Router Outputs
 output "router_id" {
   value       = module.vpc.router_id

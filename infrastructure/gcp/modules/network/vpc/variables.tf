@@ -25,14 +25,17 @@ variable "feature" {
 }
 
 # subnet arguments
-variable "pods_range_name" {
-  type        = string
-  description = "The name of the pods range."
+variable "ip_cidr_range" {
+  type        = map(string)
+  description = "The primary IP CIDR range of the subnetwork based on the environment."
 }
 
-variable "services_range_name" {
-  type        = string
-  description = "The name of the services range."
+variable "secondary_ip_range" {
+  description = "Secondary IP ranges for GKE pods and services based on the environment."
+  type = map(list(object({
+    range_name    = string
+    ip_cidr_range = string
+  })))
 }
 
 # router arguments
