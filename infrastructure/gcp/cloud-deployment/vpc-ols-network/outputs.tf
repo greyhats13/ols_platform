@@ -53,3 +53,14 @@ output "nat_id" {
   value       = module.vpc.nat_id
   description = "The unique identifier of the NAT."
 }
+
+# Firewall Outputs
+output "firewall_ids" {
+  value       = module.vpc.firewall_ids
+  description = "The unique identifier of the firewall rule"
+}
+
+output "firewall_self_links" {
+  value       = module.vpc.firewall_self_links
+  description = "The URI of the firewall rule"
+}

@@ -126,7 +126,7 @@ module "vpc" {
 | router_id | The ID of the router being created. |
 | router_self_link | The URI of the router being created. |
 | nat_id | The ID of the NAT being created. |
-| firewall_id | The ID of the firewall rule being created. |
-| firewall_self_link | The URI of the firewall rule being created. |
+| firewall_ids | The IDs of the firewall rule being created. |
+| firewall_self_links | The URIs of the firewall rule being created. |
 
 ---

@@ -58,12 +58,12 @@ output "nat_id" {
 }
 
 # Firewall output
-output "firewall_id" {
-  value       = google_compute_firewall.firewall.id
-  description = "The ID of the firewall being created."
+output "firewall_ids" {
+  description = "Map of firewall rule IDs."
+  value       = { for key, rule in google_compute_firewall.firewall : key => rule.id }
 }
 
-output "firewall_self_link" {
-  value       = google_compute_firewall.firewall.self_link
-  description = "The URI of the firewall being created."
+output "firewall_self_links" {
+  description = "Map of firewall rule self links."
+  value       = { for key, rule in google_compute_firewall.firewall : key => rule.self_link }
 }
