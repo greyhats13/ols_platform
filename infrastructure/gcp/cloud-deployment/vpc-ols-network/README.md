@@ -10,6 +10,7 @@ This deployment sets up a Google Cloud VPC for the OLS network using the `module
 - Configures a GCS backend for Terraform state storage.
 - Sets up a Google Cloud VPC with custom subnetworks and secondary IP ranges for GKE pods and services.
 - Creates a Google Compute Router and NAT for the VPC.
+- Configures firewall rules for the VPC.
 - Configures the Google Cloud provider for Terraform.
 
 ## Usage
@@ -34,7 +35,7 @@ module "vpc" {
   unit    = "ols"
   env     = "dev"
   code    = "vpc"
-  feature = ["network", "subnet", "router", "address", "nat"]
+  feature = ["network", "subnet", "router", "address", "nat", "allow"]
   ip_cidr_range = {
     dev = "10.0.0.0/16"
     stg = "10.1.0.0/16"
@@ -50,7 +51,7 @@ module "vpc" {
         range_name    = "services-range"
         ip_cidr_range = "172.17.0.0/16"
       }
-    ]
+    ],
     stg = [
       {
         range_name    = "pods-range"
@@ -60,7 +61,7 @@ module "vpc" {
         range_name    = "services-range"
         ip_cidr_range = "172.19.0.0/16"
       }
-    ]
+    ],
     prd = [
       {
         range_name    = "pods-range"
@@ -74,6 +75,27 @@ module "vpc" {
   }
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+  
+  vpc_firewall_rules = {
+    <firewall_rule_name> = {
+      name          = "<Firewall Rule Name>"
+      description   = "<Description>"
+      direction     = "<Direction>"
+      allow         = [
+        {
+          protocol = "<Protocol>"
+          ports    = ["<Port Range 1>", "<Port Range 2>", ...]
+        }
+      ]
+      source_ranges = {
+        any    = ["<Any Source Range>"],
+        dev    = ["<Dev Source Range>"],
+        stg    = ["<Stg Source Range>"],
+        prd    = ["<Prd Source Range>"]
+      }
+      priority      = <Priority>
+    }
+  }
 }
 ```
 
@@ -120,5 +142,7 @@ To authenticate with Google Cloud, you can use one of the following methods:
 | router_id            | The ID of the router.                                |
 | router_self_link     | The URI of the router.                               |
 | nat_id               | The ID of the NAT.                                   |
+| firewall_ids         | The IDs of the firewall rules.                       |
+| firewall_self_links  | The URIs of the firewall rules.                      |
 
 ---
