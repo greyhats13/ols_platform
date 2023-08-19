@@ -57,3 +57,20 @@ variable "subnetworks" {
   description = "List of subnetworks to configure NAT for."
   default = []
 }
+
+# firewall arguments
+variable "vpc_firewall_rules" {
+  description = "Map of firewall rules to be applied to the VPC."
+  type = map(object({
+    name          = string
+    description   = string
+    direction     = string
+    allow         = list(object({
+      protocol = string
+      ports    = list(string)
+    }))
+    source_ranges = map(list(string))
+    priority      = number
+  }))
+  default = {}
+}

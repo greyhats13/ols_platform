@@ -62,3 +62,26 @@ resource "google_compute_router_nat" "nat" {
     }
   }
 }
+
+# Create default firewall rules
+
+resource "google_compute_firewall" "firewall" {
+  for_each = var.vpc_firewall_rules
+  name     = "${var.unit}-${var.env}-${var.code}-${var.feature[5]}-${each.key}"
+  network  = google_compute_network.vpc.self_link
+
+  dynamic "allow" {
+    for_each = each.value.allow
+    content {
+      protocol = allow.value.protocol
+      ports    = allow.value.ports
+    }
+  }
+
+  source_ranges = each.key == "internal" && var.env == "dev" ? each.value.source_ranges.dev : (
+                    each.key == "internal" && var.env == "stg" ? each.value.source_ranges.stg : (
+                      each.key == "internal" && var.env == "prd" ? each.value.source_ranges.prd : each.value.source_ranges.any
+                    )
+                  )
+  priority = each.value.priority
+}
