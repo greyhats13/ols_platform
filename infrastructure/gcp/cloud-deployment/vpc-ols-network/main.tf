@@ -11,7 +11,7 @@ module "vpc" {
   source  = "../../modules/network/vpc"
   region  = "asia-southeast2"
   unit    = "ols"
-  env     = "prd"
+  env     = "dev"
   code    = "vpc"
   feature = ["network", "subnet", "router", "address", "nat"]
   ip_cidr_range = {
