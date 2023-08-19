@@ -10,25 +10,31 @@ data "terraform_remote_state" "vpc_ols_network" {
   backend = "gcs"
 
   config = {
-    bucket = "${var.unit}-${var.env}-gcloud-storage-tfstate"
-    prefix = "vpc/${var.unit}-${var.env}-vpc-network"
+    bucket = "ols-dev-gcloud-storage-tfstate"
+    prefix = "vpc/ols-dev-vpc-network"
   }
 }
 
 # create gke from modules gke
 module "gke" {
-  source                        = "../../modules/compute/gkubernetes-engine"
-  region                        = "asia-southeast2"
-  unit                          = "ols"
-  env                           = "dev"
-  code                          = "compute"
-  feature                       = "gke"
-  issue_client_certificate      = true
-  vpc_self_link                 = data.terraform_remote_state.vpc_ols_network.vpc_self_link
-  subnet_self_link              = data.terraform_remote_state.vpc_ols_network.subnet_self_link
-  pods_secondary_range_name     = data.terraform_remote_state.vpc_ols_network.pods_secondary_range_name
-  services_secondary_range_name = data.terraform_remote_state.vpc_ols_network.services_secondary_range_name
-  service_account               = "ol-shop@onlineshop-378118.iam.gserviceaccount.com"
+  source                               = "../../modules/compute/gkubernetes-engine"
+  region                               = "asia-southeast2"
+  unit                                 = "ols"
+  env                                  = "dev"
+  code                                 = "compute"
+  feature                              = "gke"
+  issue_client_certificate             = true
+  vpc_self_link                        = data.terraform_remote_state.vpc_ols_network.outputs.vpc_self_link
+  subnet_self_link                     = data.terraform_remote_state.vpc_ols_network.outputs.subnet_self_link
+  binary_authorization_evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
+  pods_secondary_range_name            = data.terraform_remote_state.vpc_ols_network.outputs.pods_secondary_range_name
+  services_secondary_range_name        = data.terraform_remote_state.vpc_ols_network.outputs.services_secondary_range_name
+  service_account                      = "ol-shop@onlineshop-378118.iam.gserviceaccount.com"
+  private_cluster_config = {
+    enable_private_endpoint = true
+    enable_private_nodes    = true
+    master_ipv4_cidr_block  = "192.168.0.0/28"
+  }
   node_config = {
     ondemand = {
       is_spot      = false

@@ -5,37 +5,46 @@ resource "google_container_cluster" "cluster" {
 
   remove_default_node_pool = var.env == "dev" ? false : true
   initial_node_count       = 1
-  node_config {
-    machine_type = var.env == "dev" ? "e2-medium" : (
-    var.env == "stg" ? "e2-standard-2" : "e2-standard-4")
-    disk_size_gb    = var.default_disk_size_gb
-    disk_type       = var.default_disk_type
-    service_account = var.service_account
-    oauth_scopes    = var.oauth_scopes
-  }
   master_auth {
     client_certificate_config {
-      issue_client_certificate = var.gke_issue_client_certificate
+      issue_client_certificate = var.issue_client_certificate
     }
+  }
+
+  dynamic "private_cluster_config" {
+    for_each = var.private_cluster_config
+    content {
+      enable_private_endpoint = var.env == "dev" ? false:each.value.enable_private_endpoint
+      enable_private_nodes    = each.value.enable_private_nodes
+      master_ipv4_cidr_block  = each.value.master_ipv4_cidr_block
+    }
+  }
+
+  binary_authorization {
+    evaluation_mode = var.binary_authorization_evaluation_mode
   }
 
   # add ip allocation policy
   ip_allocation_policy {
-    cluster_secondary_range_name  = var.gke_pods_secondary_range_name
-    services_secondary_range_name = var.gke_services_secondary_range_name
+    cluster_secondary_range_name  = var.pods_secondary_range_name
+    services_secondary_range_name = var.services_secondary_range_name
   }
 
   network    = var.vpc_self_link
   subnetwork = var.subnet_self_link
 }
 
+locals {
+  node_config = var.env == "dev" ? { spot = var.node_config["spot"] } : var.node_config
+}
+
 # create a ondemand node pool
 resource "google_container_node_pool" "nodepool" {
-  foreach    = var.env == "dev" ? var.node_config["spot"]: var.node_config
+  for_each   = local.node_config
   name       = each.key
-  location   = var.region
+  location   = var.env == "dev" ? "${var.region}-a" : var.region
   cluster    = google_container_cluster.cluster.name
-  node_count = each.value.node_count
+  node_count = var.env == "dev" ? 2 : each.value.node_count
 
   node_config {
     machine_type = var.env == "dev" ? each.value.machine_type[0] : (
@@ -50,7 +59,7 @@ resource "google_container_node_pool" "nodepool" {
   dynamic "autoscaling" {
     for_each = each.key == "spot" ? [1] : [0]  
     content {
-      min_node_count = each.value.node_count > 0 ? each.value.node_count : 0
+      min_node_count = var.env == "dev" ? 2 : each.value.node_count
       max_node_count = each.value.max_node_count
     }
   }
