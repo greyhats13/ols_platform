@@ -56,3 +56,14 @@ output "nat_id" {
   value       = google_compute_router_nat.nat.id
   description = "The ID of the NAT being created."
 }
+
+# Firewall output
+output "firewall_id" {
+  value       = google_compute_firewall.firewall.id
+  description = "The ID of the firewall being created."
+}
+
+output "firewall_self_link" {
+  value       = google_compute_firewall.firewall.self_link
+  description = "The URI of the firewall being created."
+}
