@@ -80,7 +80,7 @@ module "gcompute-engine" {
   target_tags   = ["atlantis"]
 }
 
-data "data_terraform_remote_state" "gcloud_dns_ols" {
+data "terraform_remote_state" "gcloud_dns_ols" {
   backend = "gcs"
 
   config = {
