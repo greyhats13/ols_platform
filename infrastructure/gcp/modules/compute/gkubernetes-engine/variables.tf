@@ -1,137 +1,135 @@
-#Naming Standard
+# Naming Standard
 variable "region" {
   type        = string
-  description = "GCP region"
+  description = "The GCP region where resources will be created."
 }
 
 variable "unit" {
   type        = string
-  description = "business unit code"
+  description = "The business unit code representing the organizational unit."
 }
 
 variable "env" {
   type        = string
-  description = "stage environment where the infrastructure will be deployed"
+  description = "The environment stage (e.g., dev, prod) where the infrastructure will be deployed."
 }
 
 variable "code" {
   type        = string
-  description = "service domain code to use"
+  description = "The service domain code representing the specific service or application."
 }
 
 variable "feature" {
   type        = string
-  description = "the name of AWS services feature"
+  description = "The specific feature or component of the AWS service being configured."
 }
 
-# gke arguments
+# GKE Arguments
 variable "issue_client_certificate" {
   type        = bool
-  description = "issue client certificate"
+  description = "Whether to issue a client certificate for authenticating to the cluster."
 }
 
 variable "vpc_self_link" {
   type        = string
-  description = "the vpc self link"
+  description = "The self-link URL of the VPC where the cluster will be created."
 }
 
 variable "subnet_self_link" {
   type        = string
-  description = "the subnet self link"
+  description = "The self-link URL of the subnet where the cluster will be created."
 }
-
 
 variable "private_cluster_config" {
   type = map(object({
-    enable_private_endpoint = bool
-    enable_private_nodes    = bool
-    master_ipv4_cidr_block  = string
+    enable_private_endpoint = bool # Whether to enable the private endpoint for the cluster's control plane.
+    enable_private_nodes    = bool # Whether to enable private nodes for the cluster.
+    master_ipv4_cidr_block  = string # The CIDR block for the master's private IP address.
   }))
-  description = "private cluster config"
+  description = "Configuration for enabling private endpoints and nodes within the cluster."
 }
 
 variable "enable_autopilot" {
   type        = bool
-  description = "enable autopilot"
+  description = "Whether to enable GKE Autopilot, a fully managed Kubernetes service."
 }
 
 variable "cluster_autoscaling" {
   type = object({
     enabled = bool
     resource_limits = map(object({
-      minimum       = number
-      maximum       = number
+      minimum       = number # The minimum number of resources to allocate.
+      maximum       = number # The maximum number of resources to allocate.
     }))
   })
-  description = "the cluster autoscaling"
+  description = "Configuration for enabling cluster autoscaling, including resource limits for CPU and memory."
 }
 
 variable "binary_authorization" {
   type = object({
     evaluation_mode = string
   })
-  description = "the binary authorization evaluation mode(Optional) Mode of operation for Binary Authorization policy evaluation. Valid values are DISABLED and PROJECT_SINGLETON_POLICY_ENFORCE"
+  description = "Configuration for Binary Authorization, which ensures only trusted container images are deployed."
 }
 
 variable "network_policy" {
   type = object({
-    enabled  = bool
-    provider = string
+    enabled  = bool # Whether to enable network policies.
+    provider = string # The network policy provider to use e.g Calico, Cilium, etc.
   })
-  description = "the network policy"
+  description = "Configuration for network policies, which control communication between Pods."
 }
 
 variable "datapath_provider" {
   type        = string
-  description = "the datapath provider"
+  description = "The provider for the datapath, which controls how data is routed within the cluster."
   default     = null
 }
 
 variable "dns_config" {
   type = map(object({
-    cluster_dns        = string
-    cluster_dns_scope  = string
-    cluster_dns_domain = string
+    cluster_dns        = string # The DNS provider to use e.g. Cloud DNS, Cloud DNS Private, etc.
+    cluster_dns_scope  = string # The scope of the DNS provider e.g. VPC Scope, Private Scope, etc.
+    cluster_dns_domain = string # The domain name for the cluster.
   }))
-  description = "the dns config"
+  description = "Configuration for DNS within the cluster, including DNS scope and domain settings."
 }
 
-# gke node pool arguments
+# GKE Node Pool Arguments
 variable "pods_secondary_range_name" {
   type        = string
-  description = "the pods secondary range name"
+  description = "The name of the secondary IP range for Pods in the cluster."
 }
 
 variable "services_secondary_range_name" {
   type        = string
-  description = "the services secondary range name"
+  description = "The name of the secondary IP range for Services in the cluster."
 }
 
 variable "node_config" {
-  description = "Configuration for ondemand and spot nodes"
+  description = "Configuration for on-demand and spot nodes, including machine type, disk size, and other settings."
   type = map(object({
-    is_spot                      = bool
-    node_count                   = number
-    machine_type                 = map(string)
-    disk_size_gb                 = number
-    disk_type                    = list(string)
-    service_account              = string
-    oauth_scopes                 = list(string)
+    is_spot                      = bool # Whether to use spot instances for the node pool e.g true or false.
+    node_count                   = number # The number of nodes to create in the node pool e.g. 1.
+    machine_type                 = map(string) # The machine type to use for the node pool e.g. e2-medium, n1-standard-2, etc.
+    disk_size_gb                 = number # The size of the disk attached to each node e.g. 20.
+    disk_type                    = list(string) # The type of disk attached to each node e.g. pd-standard, pd-ssd.
+    service_account              = string # The service account to use for the node pool
+    oauth_scopes                 = list(string) # The OAuth scopes to use for the node pool e.g. https://www.googleapis.com/auth/cloud-platform.
     tags                         = list(string)
-    shielded_instance_config = object({
-      enable_secure_boot          = bool
-      enable_integrity_monitoring = bool
+    shielded_instance_config = object({ # Shielded Instance Config
+      enable_secure_boot          = bool # Whether to enable secure boot for the node pool.
+      enable_integrity_monitoring = bool # Whether to enable integrity monitoring for the node pool.
     })
-    min_node_count = optional(number)
-    max_node_count = optional(number)
+    min_node_count = optional(number) # auto-scaling min node count
+    max_node_count = optional(number) # auto-scaling max node count
   }))
 }
 
 variable "node_management" {
-  description = "Configuration for node management"
+  description = "Configuration for node management, including auto-repair and auto-upgrade settings."
   type = object({
-    auto_repair  = bool
-    auto_upgrade = bool
+    auto_repair  = bool # Whether to enable auto-repair for the node pool.
+    auto_upgrade = bool # Whether to enable auto-upgrade for the node pool.
   })
 }
-
