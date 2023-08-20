@@ -79,3 +79,22 @@ module "gcompute-engine" {
   source_ranges = ["0.0.0.0/0"]
   target_tags   = ["atlantis"]
 }
+
+data "data_terraform_remote_state" "gcloud_dns_ols" {
+  backend = "gcs"
+
+  config = {
+    bucket = "ols-dev-gcloud-storage-tfstate"
+    prefix = "gcloud-dns/ols-dev-gcloud-dns-blast"
+  }
+}
+
+module "gcloud-dns-record" {
+  source = "../../modules/network/gcloud-dns-record"
+
+  dns_zone_name = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_name
+  subdomain     = "atlantis"
+  record_type   = "A"
+  ttl           = 300
+  rrdatas       = [module.gcompute-engine.network_interface[0].access_config[0].nat_ip]
+}
