@@ -2,8 +2,12 @@
 terraform {
   backend "gcs" {
     bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "gke/ols-dev-compute-gke"
+    prefix = "gkubernetes-engine/ols-dev-gkubernetes-engine-ols"
   }
+}
+
+data "google_service_account" "gcompute_engine_default_service_account" {
+  account_id = "104314449368242098130"
 }
 
 data "terraform_remote_state" "vpc_ols_network" {
@@ -17,44 +21,119 @@ data "terraform_remote_state" "vpc_ols_network" {
 
 # create gke from modules gke
 module "gke" {
-  source                               = "../../modules/compute/gkubernetes-engine"
-  region                               = "asia-southeast2"
-  unit                                 = "ols"
-  env                                  = "dev"
-  code                                 = "compute"
-  feature                              = "gke"
-  issue_client_certificate             = true
-  vpc_self_link                        = data.terraform_remote_state.vpc_ols_network.outputs.vpc_self_link
-  subnet_self_link                     = data.terraform_remote_state.vpc_ols_network.outputs.subnet_self_link
-  binary_authorization_evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
-  pods_secondary_range_name            = data.terraform_remote_state.vpc_ols_network.outputs.pods_secondary_range_name
-  services_secondary_range_name        = data.terraform_remote_state.vpc_ols_network.outputs.services_secondary_range_name
-  service_account                      = "ol-shop@onlineshop-378118.iam.gserviceaccount.com"
-  private_cluster_config = {
-    enable_private_endpoint = true
-    enable_private_nodes    = true
-    master_ipv4_cidr_block  = "192.168.0.0/28"
+  # Naming standard
+  source                        = "../../modules/compute/gkubernetes-engine"
+  region                        = "asia-southeast2"
+  unit                          = "ols"
+  env                           = "dev"
+  code                          = "gkubernetes-engine"
+  feature                       = "cluster"
+  # cluster arguments
+  issue_client_certificate      = true
+  vpc_self_link                 = data.terraform_remote_state.vpc_ols_network.outputs.vpc_self_link
+  subnet_self_link              = data.terraform_remote_state.vpc_ols_network.outputs.subnet_self_link
+  pods_secondary_range_name     = data.terraform_remote_state.vpc_ols_network.outputs.pods_secondary_range_name
+  services_secondary_range_name = data.terraform_remote_state.vpc_ols_network.outputs.services_secondary_range_name
+  enable_autopilot              = true
+  cluster_autoscaling = {
+    enabled = true
+    resource_limits = {
+      cpu = {
+        minimum = 2
+        maximum = 8
+      }
+      memory = {
+        minimum = 4
+        maximum = 32
+      }
+    }
   }
+  binary_authorization = {
+    evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
+  }
+  network_policy = {
+    enabled  = true
+    provider = "CALICO"
+  }
+  datapath_provider = "ADVANCED_DATAPATH"
+  private_cluster_config = {
+    dev = {
+      enable_private_endpoint = false
+      enable_private_nodes    = true
+      master_ipv4_cidr_block  = "192.168.0.0/28"
+    }
+    stg = {
+      enable_private_endpoint = false
+      enable_private_nodes    = false
+      master_ipv4_cidr_block  = "192.168.1.0/28"
+    }
+    prd = {
+      enable_private_endpoint = true
+      enable_private_nodes    = true
+      master_ipv4_cidr_block  = "192.168.2.0/28"
+    }
+  }
+
+  dns_config = {
+    dev = {
+      cluster_dns         = "CLOUD_DNS"
+      cluster_dns_scope = "VPC_SCOPE"
+      cluster_dns_domain  = "dev.ols.blast.local"
+    }
+    stg = {
+      cluster_dns         = "CLOUD_DNS"
+      cluster_dns_scope = "VPC_SCOPE"
+      cluster_dns_domain  = "stg.ols.blast.local"
+    }
+    prd = {
+      cluster_dns         = "CLOUD_DNS"
+      cluster_dns_scope = "VPC_SCOPE"
+      cluster_dns_domain  = "ols.blast.local"
+    }
+  }
+  #node pool
   node_config = {
     ondemand = {
-      is_spot      = false
-      node_count   = 1
-      machine_type = ["e2-medium", "e2-standard-2", "e2-standard-4"]
-      disk_size_gb = 20
-      disk_type    = ["pd-standard", "pd-ssd"]
-      oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
-      tags         = ["ondemand"]
+      is_spot                      = false
+      node_count                   = 1
+      machine_type                 = {
+        dev = "e2-medium"
+        stg = "e2-standard-2"
+        prd = "e2-standard-4"
+      }
+      disk_size_gb                 = 20
+      disk_type                    = ["pd-standard", "pd-ssd"]
+      service_account              = data.google_service_account.gcompute_engine_default_service_account.email
+      oauth_scopes                 = ["https://www.googleapis.com/auth/cloud-platform"]
+      tags                         = ["ondemand"]
+      shielded_instance_config = {
+        enable_secure_boot          = true
+        enable_integrity_monitoring = false
+      }
     },
     spot = {
-      is_spot        = true
-      node_count     = 0
-      machine_type   = ["e2-medium", "e2-standard-2", "e2-standard-4"]
-      disk_size_gb   = 20
-      disk_type      = ["pd-standard", "pd-ssd"]
-      oauth_scopes   = ["https://www.googleapis.com/auth/cloud-platform"]
-      tags           = ["spot"]
+      is_spot                      = true
+      node_count                   = 0
+      machine_type                 = {
+        dev = "e2-medium"
+        stg = "e2-standard-2"
+        prd = "e2-standard-4"
+      }
+      disk_size_gb                 = 20
+      disk_type                    = ["pd-standard", "pd-ssd"]
+      service_account              = data.google_service_account.gcompute_engine_default_service_account.email
+      oauth_scopes                 = ["https://www.googleapis.com/auth/cloud-platform"]
+      tags                         = ["spot"]
+      shielded_instance_config = {
+        enable_secure_boot          = true
+        enable_integrity_monitoring = false
+      }
       min_node_count = 0
       max_node_count = 20
     }
+  }
+  node_management = {
+    auto_repair  = false
+    auto_upgrade = false
   }
 }
