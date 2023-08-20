@@ -39,3 +39,14 @@ variable "zone_description" {
   type        = string
   description = "the zone description to use"
 }
+
+variable "force_destroy" {
+  type        = bool
+  description = "the force destroy to use"
+}
+
+variable "visibility" {
+  type        = string
+  description = "the visibility to use"
+  default     = "public"
+}

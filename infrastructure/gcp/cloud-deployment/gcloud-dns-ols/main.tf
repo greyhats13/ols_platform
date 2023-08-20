@@ -18,4 +18,6 @@ module "gcloud_dns" {
   zone_name        = "ols-blast"
   dns_name         = "ols.blast.co.id."
   zone_description = "Gcloud DNS for for ols.blast.co.id"
+  force_destroy    = true
+  visibility       = "public"
 }
