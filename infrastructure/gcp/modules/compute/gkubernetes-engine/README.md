@@ -169,9 +169,7 @@ module "gkubernetes_engine" {
 | Name | Description |
 |------|-------------|
 | cluster_id | The unique identifier of the GKE cluster. |
-| cluster_name |
-
- The name of the GKE cluster. |
+| cluster_name | The name of the GKE cluster. |
 | cluster_endpoint | The endpoint URL for accessing the GKE cluster. |
 | cluster_ca_certificate | The CA certificate used for authenticating to the GKE cluster. |
 | cluster_location | The location (region or zone) of the GKE cluster. |
@@ -184,13 +182,5 @@ module "gkubernetes_engine" {
 - Terraform v0.14 or higher
 - Google Cloud Platform (GCP) account with appropriate permissions
 - Google Cloud SDK (gcloud) installed and configured
-
-## Contributing
-
-Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for details.
-
-## License
-
-This module is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ---
