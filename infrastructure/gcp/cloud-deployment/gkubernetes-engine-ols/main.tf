@@ -34,7 +34,7 @@ module "gkubernetes_engine" {
   subnet_self_link              = data.terraform_remote_state.vpc_ols_network.outputs.subnet_self_link
   pods_secondary_range_name     = data.terraform_remote_state.vpc_ols_network.outputs.pods_secondary_range_name
   services_secondary_range_name = data.terraform_remote_state.vpc_ols_network.outputs.services_secondary_range_name
-  enable_autopilot              = true
+  enable_autopilot              = false
   cluster_autoscaling = {
     enabled = true
     resource_limits = {

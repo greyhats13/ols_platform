@@ -24,28 +24,49 @@ variable "feature" {
   description = "the name of AWS services feature"
 }
 
-# gce arguments
-variable "gce_machine_type" {
+# service account arguments
+variable "project_id" {
+  type        = string
+  description = "the project id to use"
+}
+
+variable "service_account_role" {
+  type        = string
+  description = "the service account role to use"
+}
+
+# gcloud compute arguments
+variable "zone" {
+  type        = string
+  description = "the zone to use"
+}
+
+variable "username" {
+  type        = string
+  description = "the username to use"
+}
+
+variable "machine_type" {
   type        = string
   description = "the machine type to use"
 }
 
-variable "gce_disk_size" {
+variable "disk_size" {
   type        = number
   description = "the disk size to use"
 }
 
-variable "gce_disk_type" {
+variable "disk_type" {
   type        = string
   description = "the disk type to use"
 }
 
-variable "gce_tags" {
+variable "tags" {
   type        = list(string)
   description = "the tags to use"
 }
   
-variable "gce_image" {
+variable "image" {
   type        = string
   description = "the image to use"
 }
@@ -60,28 +81,31 @@ variable "subnet_self_link" {
   description = "the subnet_slef_link to use"
 }
 
-# gcf arguments
-variable "gcf_protocol" {
-  type        = string
-  description = "the gcf firewall protocol to use"
+variable "extra_args" {
+  type        = map(string)
+  description = "the extra_args to use"
 }
 
-variable "gcf_ports" {
-  type        = list(string)
-  description = "the gcf firewall ports to use"
+# google cloud firewal arguments
+variable "firewall_rules" {
+  type        = map(object({
+    protocol = string
+    ports    = list(number)
+  }))
+  description = "the gcf firewall rules to use"
 }
 
-variable "gcf_source_ranges" {
+variable "source_ranges" {
   type        = list(string)
   description = "the gcf firewall source ranges to use"
 }
 
-variable "gcf_target_tags" {
-  type        = list(string)
-  description = "the gcf firewall target tags to use"
+variable "priority" {
+  type        = number
+  description = "the gcf firewall priority to use"
 }
 
-variable "cluster_name" {
-  type        = string
-  description = "GKE cluster name"
+variable "target_tags" {
+  type        = list(string)
+  description = "the gcf firewall target tags to use"
 }

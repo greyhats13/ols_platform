@@ -53,7 +53,7 @@ resource "google_container_cluster" "cluster" {
     }
   }
   # Set datapath provider (Dataplane V2), incompatible with network policy
-  datapath_provider = var.datapath_provider
+  datapath_provider = !var.network_policy.enabled ? var.datapath_provider: null
   # Define authorized networks for master access
   master_authorized_networks_config {
     cidr_blocks {
