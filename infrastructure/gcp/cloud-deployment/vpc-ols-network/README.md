@@ -20,8 +20,8 @@ This deployment sets up a Google Cloud VPC for the OLS network using the `module
 ```hcl
 terraform {
   backend "gcs" {
-    bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "vpc/ols-dev-vpc-network"
+    bucket = "<GCS Bucket Name>"
+    prefix = "<GCS Bucket Prefix e.g vpc/ols-dev-vpc-networks>"
   }
 }
 ```
@@ -31,9 +31,9 @@ terraform {
 ```hcl
 module "vpc" {
   source  = "../../modules/network/vpc"
-  region  = "asia-southeast2"
-  unit    = "ols"
-  env     = "dev"
+  region  = <GCP Region>
+  unit    = <Business Unit Code>
+  env     = <Environment> # dev, stg, or prd
   code    = "vpc"
   feature = ["network", "subnet", "router", "address", "nat", "allow"]
   ip_cidr_range = {

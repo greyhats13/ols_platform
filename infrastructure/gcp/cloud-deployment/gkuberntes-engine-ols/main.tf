@@ -63,8 +63,8 @@ module "gkubernetes_engine" {
       master_ipv4_cidr_block  = "192.168.0.0/28"
     }
     stg = {
-      enable_private_endpoint = false
-      enable_private_nodes    = false
+      enable_private_endpoint = true
+      enable_private_nodes    = true
       master_ipv4_cidr_block  = "192.168.1.0/28"
     }
     prd = {
