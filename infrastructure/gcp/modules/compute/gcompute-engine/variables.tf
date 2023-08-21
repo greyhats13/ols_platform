@@ -1,146 +1,146 @@
-#Naming Standard
+# Naming Standard
 variable "region" {
   type        = string
-  description = "GCP region"
+  description = "The Google Cloud region where resources will be created."
 }
 
 variable "unit" {
   type        = string
-  description = "business unit code"
+  description = "Business unit code representing the organizational entity within the company."
 }
 
 variable "env" {
   type        = string
-  description = "stage environment where the infrastructure will be deployed"
+  description = "Environment stage (e.g., dev, prod) where the infrastructure will be deployed."
 }
 
 variable "code" {
   type        = string
-  description = "service domain code to use"
+  description = "Service domain code representing the specific service or application."
 }
 
 variable "feature" {
   type        = list(string)
-  description = "the name of AWS services feature"
+  description = "Features name of the service or application."
 }
 
-# service account arguments
+# Service Account Arguments
 variable "project_id" {
   type        = string
-  description = "the project id to use"
+  description = "The Google Cloud Project ID where resources will be managed."
 }
 
 variable "service_account_role" {
   type        = string
-  description = "the service account role to use"
+  description = "IAM role to be assigned to the service account."
 }
 
-# gcloud compute arguments
+# Google Cloud Compute Arguments
 variable "zone" {
   type        = string
-  description = "the zone to use"
+  description = "The Google Cloud zone within the region for resource placement."
 }
 
 variable "username" {
   type        = string
-  description = "the username to use"
+  description = "Username for accessing the virtual machine instances."
 }
 
 variable "machine_type" {
   type        = string
-  description = "the machine type to use"
+  description = "The machine type (e.g., n1-standard-1) for the virtual machine instances."
 }
 
 variable "disk_size" {
   type        = number
-  description = "the disk size to use"
+  description = "The size of the persistent disk, in GB."
 }
 
 variable "disk_type" {
   type        = string
-  description = "the disk type to use"
+  description = "The type of persistent disk to use (e.g., pd-standard, pd-ssd)."
 }
 
 variable "tags" {
   type        = list(string)
-  description = "the tags to use"
+  description = "Tags to be applied to resources for identification and grouping."
 }
 
 variable "image" {
   type        = string
-  description = "the image to use"
+  description = "The source image for the virtual machine instances."
 }
 
 variable "network_self_link" {
   type        = string
-  description = "the netwnetwork_self_link to use"
+  description = "The self-link URL of the network to which the instances will be connected."
 }
 
 variable "subnet_self_link" {
   type        = string
-  description = "the subnet_slef_link to use"
+  description = "The self-link URL of the subnet within the network."
 }
 
 variable "is_public" {
   type        = bool
-  description = "the is_public to use"
+  description = "Boolean flag to control whether instances are assigned a public IP address."
 }
 
 variable "access_config" {
-  type = map(map(string))
-  description = "the access_config to use"
+  type        = map(map(string))
+  description = "Configuration for accessing the instances, including public IP assignment."
 }
 
 variable "run_ansible" {
   type        = bool
-  description = "run ansible playbook"
+  description = "Flag to control whether to run the Ansible playbook as part of the provisioning process."
 }
 
 variable "ansible_vars" {
   type        = map(string)
-  description = "ansible vars"
+  description = "Variables to be passed to the Ansible playbook."
 }
 
 variable "ansible_tags" {
   type        = list(string)
-  description = "ansible tags"
+  description = "Tags to be used to control which Ansible tasks are run."
 }
 
 variable "ansible_skip_tags" {
   type        = list(string)
-  description = "ansible skip tags"
+  description = "Tags to be used to control which Ansible tasks are skipped."
 }
 
-# dns record arguments
+# DNS Record Arguments
 variable "create_dns_record" {
   type        = bool
-  description = "create dns record"
+  description = "Flag to control whether to create a DNS record for the instances."
 }
 
 variable "dns_config" {
-  description = "dns config"
+  description = "Configuration for the DNS record, including domain name and record type."
 }
 
-# google cloud firewal arguments
+# Google Cloud Firewall Arguments
 variable "firewall_rules" {
   type = map(object({
     protocol = string
     ports    = list(number)
   }))
-  description = "the gcf firewall rules to use"
+  description = "Map of firewall rules to apply, including protocol and port range."
 }
 
 variable "source_ranges" {
   type        = list(string)
-  description = "the gcf firewall source ranges to use"
+  description = "List of source IP address ranges that will be allowed to connect to the instances."
 }
 
 variable "priority" {
   type        = number
-  description = "the gcf firewall priority to use"
+  description = "Priority of the firewall rules, with lower numbers indicating higher priority."
 }
 
 variable "target_tags" {
   type        = list(string)
-  description = "the gcf firewall target tags to use"
+  description = "Tags for the target resources to which the firewall rules will be applied."
 }
