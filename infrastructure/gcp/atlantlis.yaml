@@ -36,7 +36,7 @@ projects:
   - dir: cloud-deployment/gcompute-engine-atlantis
     apply_requirements: ["approved", "mergeable"]
     autoplan:
-      when_modified: ["*.tf*", "*.yml"]
+      when_modified: ["*.tf*", "*.yml*"]
   - dir: k8s-deployment/helm-nginx
     apply_requirements: ["approved", "mergeable"]
     autoplan:
