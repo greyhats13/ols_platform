@@ -96,5 +96,5 @@ module "gcloud-dns-record" {
   subdomain     = "atlantis"
   record_type   = "A"
   ttl           = 300
-  rrdatas       = [module.gcompute-engine.network_interface[0].access_config[0].nat_ip]
+  rrdatas       = [module.gcompute-engine.public_ip]
 }
