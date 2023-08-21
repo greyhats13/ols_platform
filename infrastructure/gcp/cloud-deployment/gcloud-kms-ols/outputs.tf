@@ -11,3 +11,7 @@ output "cryptokey_id" {
 output "service_account_id" {
   value = module.gcloud_kms.service_account_id
 }
+
+output "service_account_email" {
+  value = module.gcloud_kms.service_account_email
+}

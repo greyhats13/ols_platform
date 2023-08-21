@@ -5,12 +5,12 @@ resource "google_service_account" "service_account" {
 }
 
 resource "google_kms_key_ring" "keyring" {
-  name     = var.keyring_name
+  name     = "${var.unit}-${var.env}-${var.code}-${var.feature[1]}"
   location = var.location
 }
 
 resource "google_kms_crypto_key" "cryptokey" {
-  name                       = var.cryptokey_name
+  name                       = "${var.unit}-${var.env}-${var.code}-${var.feature[2]}"
   key_ring                   = google_kms_key_ring.keyring.self_link
   rotation_period            = var.rotation_period
   destroy_scheduled_duration = var.destroy_scheduled_duration
