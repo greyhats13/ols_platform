@@ -8,6 +8,11 @@ variable "dns_zone_name" {
   type        = string
 }
 
+variable "dns_name" {
+  description = "dns name"
+  type        = string
+}
+
 variable "record_type" {
   description = "record type"
   type        = string

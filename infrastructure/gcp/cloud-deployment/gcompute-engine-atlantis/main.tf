@@ -24,12 +24,28 @@ data "terraform_remote_state" "gkubernetes_engine_ols" {
   }
 }
 
-variable "github_token" {
-  sensitive = true
+variable "github_token_ciphertext" {}
+variable "github_webhook_secret_ciphertext" {}
+
+data "terraform_remote_state" "kms_ols_cryptokey" {
+  backend = "gcs"
+
+  config = {
+    bucket = "ols-dev-gcloud-storage-tfstate"
+    prefix = "gcloud-kms/ols-dev-gcloud-kms-ols"
+  }
 }
-variable "github_webhook_secret" {
-  sensitive = true
+
+data "google_kms_secret" "github_token" {
+  crypto_key = data.terraform_remote_state.kms_ols_cryptokey.outputs.cryptokey_id
+  ciphertext = var.github_token_ciphertext
 }
+
+data "google_kms_secret" "github_webhook_secret" {
+  crypto_key = data.terraform_remote_state.kms_ols_cryptokey.outputs.cryptokey_id
+  ciphertext = var.github_webhook_secret_ciphertext
+}
+
 
 data "google_project" "current" {}
 
@@ -53,9 +69,9 @@ module "gcompute-engine" {
   tags                  = ["atlantis"]
   image                 = "debian-cloud/debian-11"
   extra_args            = {
-    dev = "-e project_id='${data.google_project.current.project_id}' -e cluster_name='${data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name}' -e region='asia-southeast2-a' -e github_token='${var.github_token}' -e github_webhook_secret='${var.github_webhook_secret}'"
-    stg = "-e project_id='${data.google_project.current.project_id}' -e cluster_name='${data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name}' -e region='asia-southeast2' -e github_token='${var.github_token}' -e github_webhook_secret='${var.github_webhook_secret}'"
-    prd = "-e project_id='${data.google_project.current.project_id}' -e cluster_name='${data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name}' -e region='asia-southeast2' -e github_token='${var.github_token}' -e github_webhook_secret='${var.github_webhook_secret}'"
+    dev = "-e project_id='${data.google_project.current.project_id}' -e cluster_name='${data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name}' -e region='asia-southeast2-a' -e github_token='${data.google_kms_secret.github_token.plaintext}' -e github_webhook_secret='${data.google_kms_secret.github_webhook_secret.plaintext}'"
+    stg = "-e project_id='${data.google_project.current.project_id}' -e cluster_name='${data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name}' -e region='asia-southeast2' -e github_token='${data.google_kms_secret.github_token.plaintext}' -e github_webhook_secret='${data.google_kms_secret.github_webhook_secret.plaintext}'"
+    prd = "-e project_id='${data.google_project.current.project_id}' -e cluster_name='${data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name}' -e region='asia-southeast2' -e github_token='${data.google_kms_secret.github_token.plaintext}' -e github_webhook_secret='${data.google_kms_secret.github_webhook_secret.plaintext}'"
   }
   firewall_rules = {
     "ssh" = {
@@ -92,7 +108,8 @@ data "terraform_remote_state" "gcloud_dns_ols" {
 module "gcloud-dns-record" {
   source = "../../modules/network/gcloud-dns-record"
 
-  dns_zone_name = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_name
+  dns_name      = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_name 
+  dns_zone_name = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_zone_name
   subdomain     = "atlantis"
   record_type   = "A"
   ttl           = 300

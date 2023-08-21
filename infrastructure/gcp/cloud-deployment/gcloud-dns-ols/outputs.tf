@@ -4,6 +4,10 @@ output "dns_id" {
   value = module.gcloud_dns.dns_id
 }
 
+output "dns_zone_name" {
+  value = module.gcloud_dns.dns_zone_name
+}
+
 output "dns_name" {
   value = module.gcloud_dns.dns_name
 }
