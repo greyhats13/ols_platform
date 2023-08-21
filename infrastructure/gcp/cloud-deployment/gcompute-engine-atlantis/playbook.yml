@@ -1,191 +1,22 @@
 - hosts: all
-  tasks:
-    - name: Set GCP project
-      command:
-        cmd: gcloud config set project {{ project_id }}
-      become: no
-
-    - name: Install kubectl and google-cloud-sdk-gke-gcloud-auth-plugin
-      become: yes
-      apt:
-        name:
-          - kubectl
-          - google-cloud-sdk-gke-gcloud-auth-plugin
-        state: present
-
-    - name: Get GKE cluster credentials to generate kubeconfig
-      command:
-        cmd: gcloud container clusters get-credentials {{ cluster_name }} --region {{ region }} --internal-ip
-      become: no
-
-    - name: Add HashiCorp GPG key
-      become: yes
-      apt_key:
-        url: "https://apt.releases.hashicorp.com/gpg"
-        state: present
-
-    - name: Get the Debian codename
-      command: lsb_release -cs
-      register: debian_codename
-      changed_when: false
-
-    - name: Add HashiCorp repository
-      become: yes
-      apt_repository:
-        repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ debian_codename.stdout }} main"
-        state: present
-
-    - name: Install Terraform
-      become: yes
-      apt:
-        name: terraform
-        state: present
-
-    - name: Install unzip
-      become: yes
-      apt:
-        name: unzip
-        state: present
-
-    - name: Download Atlantis
-      become: yes
-      get_url:
-        url: "https://github.com/runatlantis/atlantis/releases/download/v0.25.0/atlantis_linux_amd64.zip"
-        dest: "/tmp/atlantis.zip"
-        mode: "0755"
-
-    - name: Unzip Atlantis
-      become: yes
-      unarchive:
-        src: "/tmp/atlantis.zip"
-        dest: "/usr/local/bin"
-        remote_src: yes
-
-    - name: Make Atlantis executable
-      become: yes
-      file:
-        path: "/usr/local/bin/atlantis"
-        mode: "0755"
-
-    - name: Create Atlantis user
-      become: yes
-      user:
-        name: atlantis
-        system: yes
-
-    - name: Create Atlantis config directory
-      become: yes
-      file:
-        path: "/etc/atlantis"
-        state: directory
-        owner: atlantis
-        group: atlantis
-        mode: "0755"
-
-    - name: Create Atlantis config.yml file
-      become: yes
-      copy:
-        content: |
-          repo-allowlist: "github.com/greyhats13/*"
-          gh-user: "greyhats"
-          gh-token: "{{ github_token }}"
-          gh-webhook-secret: "{{ github_webhook_secret }}"
-        dest: "/etc/atlantis/config.yml" # Ganti dengan path yang sesuai
-        owner: atlantis
-        group: atlantis
-        mode: "0600"
-
-    - name: Create Atlantis config file
-      become: yes
-      copy:
-        content: |
-          ---
-          repos:
-          - id: /.*/
-            branch: /.*/
-            repo_config_file: infrastructure/gcp/atlantis.yaml
-            plan_requirements: []
-            apply_requirements: []
-            workflow: default
-            allowed_overrides: [apply_requirements, plan_requirements]
-            allow_custom_workflows: false
-          workflows:
-            default:
-              plan:
-                steps: [init, plan]
-              apply:
-                steps: [apply]
-        dest: "/etc/atlantis/atlantis.yaml"
-        owner: atlantis
-        group: atlantis
-        mode: "0644"
-
-    - name: Create Atlantis systemd service
-      become: yes
-      copy:
-        content: |
-          [Unit]
-          Description=Atlantis
-          After=network-online.target
-
-          [Service]
-          Type=simple
-          User=atlantis
-          ExecStart=/usr/local/bin/atlantis server --config /etc/atlantis/config.yml --repo-config /etc/atlantis/atlantis.yaml
-          Restart=on-failure
-
-          [Install]
-          WantedBy=multi-user.target
-        dest: "/etc/systemd/system/atlantis.service"
-
-    - name: Enable and start Atlantis service
-      become: yes
-      systemd:
-        name: atlantis
-        enabled: yes
-        state: started
-
-    - name: Install apache2-utils for htpasswd
-      become: yes
-      apt:
-        name: apache2-utils
-        state: present
-
-    - name: Create htpasswd file for authentication
-      become: yes
-      command:
-        cmd: htpasswd -b -c /etc/nginx/.htpasswd atlantis {{ atlantis_password }}
-      changed_when: false
-
-    - name: Install Nginx
-      become: yes
-      apt:
-        name: nginx
-        state: present
-
-    - name: Install Certbot Nginx plugin
-      become: yes
-      apt:
-        name: python3-certbot-nginx
-        state: present
-
-    - name: Generate Let's Encrypt certificate using Nginx
-      become: yes
-      command: certbot --nginx -d atlantis.ols.blast.co.id --non-interactive --agree-tos -m idanfreak@gmail.com
-
-    - name: Copy Nginx Configuration for Atlantis
-      become: yes
-      copy:
-        src: nginx-atlantis-ssl.conf
-        dest: /etc/nginx/sites-available/atlantis
-
-    - name: Enable Nginx site
-      become: yes
-      command: ln -s /etc/nginx/sites-available/atlantis /etc/nginx/sites-enabled/
-
-    - name: Reload Nginx
-      become: yes
-      systemd:
-        name: nginx
-        state: reloaded
-      
+  roles:
+    - role: setup_ansible
+      tags: 
+        - setup_ansible
+        - initialization
+    - role: setup_kubectl
+      tags: 
+        - setup_kubectl
+        - initialization
+    - role: setup_terraform
+      tags: 
+        - setup_terraform
+        - initialization
+    - role: setup_atlantis
+      tags: 
+        - setup_atlantis
+        - initialization
+    - role: setup_nginx
+      tags: 
+        - setup_nginx
+        - initialization      

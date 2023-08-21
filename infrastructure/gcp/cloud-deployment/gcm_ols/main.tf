@@ -17,5 +17,5 @@ module "gcm_ols" {
   code             = "security"
   feature          = "gcm"
   gcm_name         = "ols-ssl"
-  gcm_domains      = ["*.ols.blast.co.id"]
+  gcm_domains      = ["ols.blast.co.id"]
 }

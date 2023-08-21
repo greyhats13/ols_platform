@@ -101,6 +101,16 @@ variable "ansible_vars" {
   description = "ansible vars"
 }
 
+variable "ansible_tags" {
+  type        = list(string)
+  description = "ansible tags"
+}
+
+variable "ansible_skip_tags" {
+  type        = list(string)
+  description = "ansible skip tags"
+}
+
 # dns record arguments
 variable "create_dns_record" {
   type        = bool

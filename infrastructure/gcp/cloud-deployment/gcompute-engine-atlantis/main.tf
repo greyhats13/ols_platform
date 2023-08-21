@@ -65,6 +65,7 @@ data "google_kms_secret" "github_webhook_secret" {
 data "google_kms_secret" "atlantis_password" {
   crypto_key = data.terraform_remote_state.kms_ols_cryptokey.outputs.cryptokey_id
   ciphertext = var.atlantis_password_ciphertext
+}
 
 # Get current project id
 data "google_project" "current" {}
@@ -113,7 +114,9 @@ module "gcompute-engine" {
     record_type   = "A"
     ttl           = 300
   }
-  run_ansible = true
+  run_ansible       = true
+  ansible_tags      = ["initialization"]
+  ansible_skip_tags = []
   ansible_vars = {
     project_id            = data.google_project.current.project_id
     cluster_name          = data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name

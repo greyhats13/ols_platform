@@ -107,7 +107,11 @@ resource "local_file" "ansible_vars" {
 resource "null_resource" "ansible_playbook" {
   count = var.run_ansible ? 1 : 0
   provisioner "local-exec" {
-    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${google_compute_instance.instance.network_interface.0.access_config.0.nat_ip}, -u ${var.username} --private-key=id_rsa.pem playbook.yml  --extra-vars '@ansible_vars.json'"
+    command = var.is_public && length(var.ansible_skip_tags) > 0 ? "sleep 10 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${google_compute_instance.instance.network_interface.0.access_config.0.nat_ip}, -u ${var.username} --private-key=id_rsa.pem playbook.yml  --extra-vars '@ansible_vars.json' --tags ${join(",", var.ansible_tags)} --skip-tags ${join(",", var.ansible_skip_tags)}": (
+                var.is_public && length(var.ansible_skip_tags) <= 0 ? "sleep 10 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${google_compute_instance.instance.network_interface.0.access_config.0.nat_ip}, -u ${var.username} --private-key=id_rsa.pem playbook.yml  --extra-vars '@ansible_vars.json' --tags ${join(",", var.ansible_tags)}": (
+                  !var.is_public && length(var.ansible_skip_tags) > 0 ? "sleep 10 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${google_compute_instance.instance.network_interface.0.network_ip}, -u ${var.username} --private-key=id_rsa.pem playbook.yml  --extra-vars '@ansible_vars.json' --tags ${join(",", var.ansible_tags)} --skip-tags ${join(",", var.ansible_skip_tags)}":"sleep 10 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${google_compute_instance.instance.network_interface.0.network_ip}, -u ${var.username} --private-key=id_rsa.pem playbook.yml  --extra-vars '@ansible_vars.json' --tags ${join(",", var.ansible_tags)}"
+                )
+              )
   }
 
   triggers = {
