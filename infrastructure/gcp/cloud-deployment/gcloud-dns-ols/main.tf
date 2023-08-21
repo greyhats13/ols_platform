@@ -2,14 +2,14 @@
 terraform {
   backend "gcs" {
     bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "gcloud-kms/ols-dev-gcloud-kms-ols"
+    prefix = "gcloud-dns/ols-dev-gcloud-dns-blast"
   }
 }
 
 # create cloud dns module
 
-module "gcloud_kms" {
-  source           = "../../modules/security/gcloud-kms"
+module "gcloud_dns" {
+  source           = "../../modules/security/gcloud-dns"
   region           = "asia-southeast2"
   unit             = "ols"
   env              = "dev"
