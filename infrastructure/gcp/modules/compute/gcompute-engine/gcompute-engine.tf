@@ -62,12 +62,19 @@ resource "google_compute_instance" "instance" {
     email  = google_service_account.sa.email
     scopes = ["cloud-platform"]
   }
-
   tags = var.tags
+}
+
+resource "null_resource" "ansible_playbook" {
   provisioner "local-exec" {
-    # 30s after instance is created, run ansible playbook
-    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${self.network_interface.0.access_config.0.nat_ip}, -u ${var.username} --private-key=private_key.pem playbook.yml ${var.extra_args[var.env]}"
+    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${google_compute_instance.instance.network_interface.0.access_config.0.nat_ip}, -u ${var.username} --private-key=private_key.pem playbook.yml ${var.extra_args[var.env]}"
   }
+
+  triggers = {
+    playbook_checksum = filesha256("playbook.yml")
+  }
+
+  depends_on = [google_compute_instance.instance]
 }
 
 # Firewall rule for gcompute engine instance
