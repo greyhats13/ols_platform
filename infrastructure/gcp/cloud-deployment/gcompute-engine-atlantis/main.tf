@@ -108,7 +108,8 @@ data "terraform_remote_state" "gcloud_dns_ols" {
 module "gcloud-dns-record" {
   source = "../../modules/network/gcloud-dns-record"
 
-  dns_zone_name = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_name
+  dns_name      = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_name 
+  dns_zone_name = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_zone_name
   subdomain     = "atlantis"
   record_type   = "A"
   ttl           = 300

@@ -4,6 +4,10 @@ output "dns_id" {
   value = google_dns_managed_zone.gcloud-dns.id
 }
 
+output "dns_zone_name" {
+  value = google_dns_managed_zone.gcloud-dns.name
+}
+
 output "dns_name" {
   value = google_dns_managed_zone.gcloud-dns.dns_name
 }
