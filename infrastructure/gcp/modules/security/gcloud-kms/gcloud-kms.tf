@@ -11,7 +11,7 @@ resource "google_kms_key_ring" "keyring" {
 
 resource "google_kms_crypto_key" "cryptokey" {
   name                       = "${var.unit}-${var.env}-${var.code}-${var.feature[2]}"
-  key_ring                   = google_kms_key_ring.keyring.self_link
+  key_ring                   = google_kms_key_ring.keyring.id
   rotation_period            = var.rotation_period
   destroy_scheduled_duration = var.destroy_scheduled_duration
   purpose                    = var.purpose
