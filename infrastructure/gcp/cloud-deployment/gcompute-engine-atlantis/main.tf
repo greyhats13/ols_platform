@@ -2,7 +2,7 @@
 terraform {
   backend "gcs" {
     bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "gcompute-engine/ols-dev-gcompute-engine-bastion"
+    prefix = "gcompute-engine/ols-dev-gcompute-engine-atlantis"
   }
 }
 

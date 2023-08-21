@@ -1,2 +1,0 @@
-sleep 30
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '{{ VM_PUBLIC_IP }},' -u debian --private-key=private_key.pem playbook.yml -e project_id='{{ PROJECT_ID }}'  -e cluster_name={{ CLUSTER_NAME }} -e region='{{ region }}'
