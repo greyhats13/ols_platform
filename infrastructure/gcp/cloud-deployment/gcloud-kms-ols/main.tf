@@ -8,7 +8,7 @@ terraform {
 
 # create cloud dns module
 
-module "gcloud_dns" {
+module "gcloud_kms" {
   source                     = "../../modules/security/gcloud-kms"
   region                     = "asia-southeast2"
   unit                       = "ols"
