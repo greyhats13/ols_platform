@@ -17,7 +17,7 @@ module "gcloud_kms" {
   feature                    = ["sa", "keyring", "cryptokey"]
   location                   = "global"
   rotation_period            = "2592000s"
-  destroy_scheduled_duration = "24"
+  destroy_scheduled_duration = "86400s"
   purpose                    = "ENCRYPT_DECRYPT"
   version_template = {
     algorithm        = "GOOGLE_SYMMETRIC_ENCRYPTION"
