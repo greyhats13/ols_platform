@@ -7,7 +7,7 @@ resource "tls_private_key" "tls" {
 # create private key file
 resource "local_file" "private_key" {
   content              = tls_private_key.tls.private_key_pem
-  filename             = "private_key.pem"
+  filename             = "id_rsa.pem"
   file_permission      = "0400"
   directory_permission = "0700"
 }
@@ -21,11 +21,6 @@ resource "google_service_account" "sa" {
   account_id   = "${var.unit}-${var.env}-${var.code}-${var.feature[0]}"
   display_name = "Service Account for ${var.unit}-${var.env}-${var.code}-${var.feature[0]} instance"
 }
-
-# resource "google_service_account_key" "sa_key" {
-#   service_account_id = google_service_account.sa.name
-#   public_key_type    = "TYPE_X509_PEM_FILE"
-# }
 
 # create gcompute engine service account IAM
 resource "google_project_iam_member" "sa_iam" {
@@ -50,12 +45,18 @@ resource "google_compute_instance" "instance" {
 
   network_interface {
     subnetwork = var.subnet_self_link
-    access_config {
+    dynamic "access_config" {
+      for_each = var.is_public ? [lookup(var.access_config, var.env)] : []
+      content {
+        nat_ip                 = access_config.value.nat_ip == "" ? null : access_config.value.nat_ip
+        public_ptr_domain_name = access_config.value.public_ptr_domain_name == "" ? null : access_config.value.public_ptr_domain_name
+        network_tier           = access_config.value.network_tier == "" ? null : access_config.value.network_tier
+      }
     }
   }
 
   metadata = {
-    ssh-keys = "debian:${tls_private_key.tls.public_key_openssh}"
+    ssh-keys = "${var.username}:${tls_private_key.tls.public_key_openssh}"
   }
 
   service_account {
@@ -65,16 +66,16 @@ resource "google_compute_instance" "instance" {
   tags = var.tags
 }
 
-resource "null_resource" "ansible_playbook" {
-  provisioner "local-exec" {
-    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${google_compute_instance.instance.network_interface.0.access_config.0.nat_ip}, -u ${var.username} --private-key=private_key.pem playbook.yml ${var.extra_args[var.env]}"
-  }
+# Create dns record for gcompute engine instance
+resource "google_dns_record_set" "record" {
+  count = var.create_dns_record ? 1 : 0
+  name  = "${var.feature[0]}.${var.dns_config.dns_name}"
+  type  = var.dns_config.record_type
+  ttl   = var.dns_config.ttl
 
-  triggers = {
-    playbook_checksum = filesha256("playbook.yml")
-  }
+  managed_zone = var.dns_config.dns_zone_name
 
-  depends_on = [google_compute_instance.instance]
+  rrdatas = [google_compute_instance.instance.network_interface.0.access_config.0.nat_ip]
 }
 
 # Firewall rule for gcompute engine instance
@@ -93,4 +94,29 @@ resource "google_compute_firewall" "firewall" {
   priority      = var.priority
   source_ranges = var.source_ranges
   target_tags   = var.target_tags
+}
+
+# Create ansible vars file
+resource "local_file" "ansible_vars" {
+  count    = var.run_ansible ? 1 : 0
+  content  = jsonencode(var.ansible_vars)
+  filename = "ansible_vars.json"
+}
+
+# Run ansible playbook
+resource "null_resource" "ansible_playbook" {
+  count = var.run_ansible ? 1 : 0
+  provisioner "local-exec" {
+    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${google_compute_instance.instance.network_interface.0.access_config.0.nat_ip}, -u ${var.username} --private-key=id_rsa.pem playbook.yml  --extra-vars '@ansible_vars.json'"
+  }
+
+  triggers = {
+    playbook_checksum = filesha256("playbook.yml")
+  }
+
+  depends_on = [
+    local_file.ansible_vars,
+    google_compute_instance.instance,
+    google_dns_record_set.record
+  ]
 }

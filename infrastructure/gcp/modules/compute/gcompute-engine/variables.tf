@@ -65,7 +65,7 @@ variable "tags" {
   type        = list(string)
   description = "the tags to use"
 }
-  
+
 variable "image" {
   type        = string
   description = "the image to use"
@@ -81,14 +81,39 @@ variable "subnet_self_link" {
   description = "the subnet_slef_link to use"
 }
 
-variable "extra_args" {
+variable "is_public" {
+  type        = bool
+  description = "the is_public to use"
+}
+
+variable "access_config" {
+  type = map(map(string))
+  description = "the access_config to use"
+}
+
+variable "run_ansible" {
+  type        = bool
+  description = "run ansible playbook"
+}
+
+variable "ansible_vars" {
   type        = map(string)
-  description = "the extra_args to use"
+  description = "ansible vars"
+}
+
+# dns record arguments
+variable "create_dns_record" {
+  type        = bool
+  description = "create dns record"
+}
+
+variable "dns_config" {
+  description = "dns config"
 }
 
 # google cloud firewal arguments
 variable "firewall_rules" {
-  type        = map(object({
+  type = map(object({
     protocol = string
     ports    = list(number)
   }))
