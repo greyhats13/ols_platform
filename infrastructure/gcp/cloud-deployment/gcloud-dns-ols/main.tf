@@ -2,7 +2,7 @@
 terraform {
   backend "gcs" {
     bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "gcd/ols-dev-gcloud-dns-blast"
+    prefix = "gcloud-dns/ols-dev-gcloud-dns-blast"
   }
 }
 
