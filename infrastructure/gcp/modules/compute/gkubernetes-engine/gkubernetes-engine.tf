@@ -1,9 +1,9 @@
 # Create a GKE cluster with 2 node pools
 resource "google_container_cluster" "cluster" {
   # Define the cluster name using variables
-  name             = "${var.unit}-${var.env}-${var.code}-${var.feature}"
+  name = "${var.unit}-${var.env}-${var.code}-${var.feature}"
   # Set the location based on environment and autopilot settings
-  location         = var.env == "dev" && !var.enable_autopilot ? "${var.region}-a" : var.region
+  location = var.env == "dev" && !var.enable_autopilot ? "${var.region}-a" : var.region
   # Enable autopilot if the variable is set, otherwise set to null
   enable_autopilot = !var.enable_autopilot ? null : true
   # Configure cluster autoscaling if autopilot is not enabled
@@ -53,7 +53,7 @@ resource "google_container_cluster" "cluster" {
     }
   }
   # Set datapath provider (Dataplane V2), incompatible with network policy
-  datapath_provider = !var.network_policy.enabled ? var.datapath_provider: null
+  datapath_provider = !var.network_policy.enabled ? var.datapath_provider : null
   # Define authorized networks for master access
   master_authorized_networks_config {
     cidr_blocks {
@@ -70,13 +70,13 @@ resource "google_container_cluster" "cluster" {
   network    = var.vpc_self_link
   subnetwork = var.subnet_self_link
   # Configure DNS settings based on variables
-  dynamic "dns_config" {
-    for_each = var.dns_config[var.env].cluster_dns != null ? [1] : []
+  dynamic "access_config" {
+    for_each = var.is_public ? [lookup(var.access_config, var.env)] : []
     content {
-      cluster_dns        = var.dns_config[var.env].cluster_dns
-      cluster_dns_scope  = var.dns_config[var.env].cluster_dns_scope
-      cluster_dns_domain = var.dns_config[var.env].cluster_dns_domain
-    }
+      nat_ip                 = access_config.value.nat_ip == "" ? null : access_config.value.nat_ip
+      public_ptr_domain_name = access_config.value.public_ptr_domain_name == "" ? null : access_config.value.public_ptr_domain_name
+      network_tier           = access_config.value.network_tier == "" ? null : access_config.value.network_tier
+    } 
   }
   # Define resource labels for the cluster
   resource_labels = {
@@ -94,7 +94,7 @@ locals {
 
 # Create an on-demand node pool
 resource "google_container_node_pool" "nodepool" {
-  for_each   = !var.enable_autopilot ? local.node_config: {}
+  for_each   = !var.enable_autopilot ? local.node_config : {}
   name       = each.key
   location   = var.env == "dev" && !var.enable_autopilot ? "${var.region}-a" : var.region
   cluster    = google_container_cluster.cluster.name
