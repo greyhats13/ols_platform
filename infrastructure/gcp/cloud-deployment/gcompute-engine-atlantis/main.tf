@@ -49,6 +49,7 @@ data "terraform_remote_state" "kms_ols_cryptokey" {
 # Load encrypted github token and webhook secret from github.auto.tfvars
 variable "github_token_ciphertext" {}
 variable "github_webhook_secret_ciphertext" {}
+variable "atlantis_password_ciphertext" {}
 
 # Decrypt github token and webhook secret using kms cryptokey
 data "google_kms_secret" "github_token" {
@@ -60,6 +61,10 @@ data "google_kms_secret" "github_webhook_secret" {
   crypto_key = data.terraform_remote_state.kms_ols_cryptokey.outputs.cryptokey_id
   ciphertext = var.github_webhook_secret_ciphertext
 }
+
+data "google_kms_secret" "atlantis_password" {
+  crypto_key = data.terraform_remote_state.kms_ols_cryptokey.outputs.cryptokey_id
+  ciphertext = var.atlantis_password_ciphertext
 
 # Get current project id
 data "google_project" "current" {}
@@ -115,6 +120,7 @@ module "gcompute-engine" {
     region                = "asia-southeast2-a"
     github_token          = data.google_kms_secret.github_token.plaintext
     github_webhook_secret = data.google_kms_secret.github_webhook_secret.plaintext
+    atlantis_password     = data.google_kms_secret.atlantis_password.plaintext
   }
   firewall_rules = {
     "ssh" = {

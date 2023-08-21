@@ -145,6 +145,18 @@
         enabled: yes
         state: started
 
+    - name: Install apache2-utils for htpasswd
+      become: yes
+      apt:
+        name: apache2-utils
+        state: present
+
+    - name: Create htpasswd file for authentication
+      become: yes
+      command:
+        cmd: htpasswd -b -c /etc/nginx/.htpasswd atlantis {{ atlantis_password }}
+      changed_when: false
+
     - name: Install Nginx
       become: yes
       apt:
