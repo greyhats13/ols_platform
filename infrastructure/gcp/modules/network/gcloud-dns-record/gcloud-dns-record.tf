@@ -1,4 +1,4 @@
-resource "google_dns_record_set" "frontend" {
+resource "google_dns_record_set" "record" {
   name = "${var.subdomain}.${var.dns_zone_name}"
   type = var.record_type
   ttl  = var.ttl
