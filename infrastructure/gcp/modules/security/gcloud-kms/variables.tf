@@ -25,22 +25,12 @@ variable "feature" {
 }
 
 # keyring arguments
-variable "keyring_name" {
-  type        = string
-  description = "The name of the keyring"
-}
-
 variable "location" {
   type        = string
   description = "The location of the keyring"
 }
 
 # cryptokey arguments
-variable "cryptokey_name" {
-  type        = string
-  description = "The name of the cryptokey"
-}
-
 variable "rotation_period" {
   type        = string
   description = "The rotation period of the cryptokey"
