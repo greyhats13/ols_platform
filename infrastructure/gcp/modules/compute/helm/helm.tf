@@ -1,3 +1,20 @@
+# Create namespace
+resource "kubernetes_namespace" "namespace" {
+  count = var.create_namespace ? 1 : 0
+  metadata {
+    name = var.namespace
+  }
+}
+
+locals {
+  namespace = var.create_namespace ? kubernetes_namespace.namespace[0].metadata[0].name : var.namespace
+}
+
+resource "kubernetes_manifest" "manifest" {
+  count = var.create_managed_certificate ? 1 : 0
+  manifest = yamldecode(templatefile("${path.module}/managed-cert.yaml", { feature = var.feature, namespace = local.namespace }))
+}
+
 resource "google_service_account" "gsa" {
   count        = var.create_service_account ? 1 : 0
   project      = var.project_id
@@ -13,32 +30,25 @@ resource "google_project_iam_member" "sa_iam" {
   member  = "serviceAccount:${google_service_account.gsa[0].email}"
 }
 
-# Create namespace
-resource "kubernetes_namespace" "namespace" {
-  metadata {
-    name = var.namespace
-  }
-}
-
 # Create a kubernetes service account
 resource "kubernetes_service_account" "ksa" {
   count = var.create_service_account ? 1 : 0
   metadata {
     name      = "${var.unit}-${var.env}-${var.code}-${var.feature}"
-    namespace = kubernetes_namespace.namespace.metadata[0].name
+    namespace = local.namespace
   }
 
   automount_service_account_token = true
 }
 
-resource "kubernetes_cluster_role" "external_dns" {
+resource "kubernetes_cluster_role" "cluster_role" {
   count = var.create_service_account ? 1 : 0
   metadata {
     name = "${var.unit}-${var.env}-${var.code}-${var.feature}"
   }
 
   dynamic "rule" {
-    for_each = var.kubernetes_cluster_role_rules != {} ? [var.kubernetes_cluster_role_rules] : []
+    for_each = var.kubernetes_cluster_role_rules != null ? [var.kubernetes_cluster_role_rules] : []
     content {
       api_groups = rule.value.api_groups
       resources  = rule.value.resources
@@ -47,7 +57,7 @@ resource "kubernetes_cluster_role" "external_dns" {
   }
 }
 
-resource "kubernetes_cluster_role_binding" "external_dns" {
+resource "kubernetes_cluster_role_binding" "cluster_role_binding" {
   count = var.create_service_account ? 1 : 0
   metadata {
     name = "${var.unit}-${var.env}-${var.code}-${var.feature}"
@@ -56,23 +66,22 @@ resource "kubernetes_cluster_role_binding" "external_dns" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.external_dns[0].metadata[0].name
+    name      = kubernetes_cluster_role.cluster_role[0].metadata[0].name
   }
 
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_cluster_role.external_dns[0].metadata[0].name
-    namespace = kubernetes_namespace.namespace.metadata[0].name
+    name      = kubernetes_cluster_role.cluster_role[0].metadata[0].name
+    namespace = local.namespace
   }
 }
-
 
 resource "helm_release" "helm" {
   name       = "${var.unit}-${var.release_name}"
   repository = var.repository
   chart      = var.chart
   values     = length(var.values) > 0 ? var.values : []
-  namespace  = kubernetes_namespace.namespace.metadata[0].name
+  namespace  = local.namespace
   lint       = true
   dynamic "set" {
     for_each = length(var.helm_sets) > 0 ? {

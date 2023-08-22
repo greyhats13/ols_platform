@@ -2,64 +2,62 @@
 terraform {
   backend "gcs" {
     bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "helm/ols-dev-helm-external-dns"
+    prefix = "helm/ols-dev-helm-argo-cd"
   }
 }
 
 data "google_project" "current" {}
 
-# create a GKE cluster with 2 node pools
-data "terraform_remote_state" "gcloud_dns_ols" {
-  backend = "gcs"
-
-  config = {
-    bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "gcloud-dns/ols-dev-gcloud-dns-blast"
-  }
-}
-
-module "externaldns" {
+module "helm" {
   source                 = "../../modules/compute/helm"
   region                 = "asia-southeast2"
   unit                   = "ols"
   env                    = "dev"
   code                   = "helm"
-  feature                = "external-dns"
-  release_name           = "external-dns"
-  repository             = "https://charts.bitnami.com/bitnami"
-  chart                  = "external-dns"
-  create_service_account = true
+  feature                = "argo-cd"
+  release_name           = "argo-cd"
+  repository             = "https://argoproj.github.io/argo-helm"
+  chart                  = "argo-cd"
+  create_service_account = false
   project_id             = data.google_project.current.project_id
-  service_account_role   = "roles/dns.admin"
+  service_account_role   = null
   kubernetes_cluster_role_rules = {
-    api_groups = [""]
-    resources  = ["services", "endpoints", "pods"]
-    verbs      = ["get", "list", "watch"]
+    api_groups = []
+    resources  = []
+    verbs      = []
   }
-  values = []
+  create_managed_certificate = true
+  values                     = []
   helm_sets = [
-    # Dont create service acocunt
     {
-      name = "serviceAccount.create"
-      value = false
-    },
-    # Use existing service account if create_service_account is set to true
-    {
-      name = "serviceAccount.name"
-      value = "ols-dev-helm-external-dns"
+      name  = "server.ingress.annotations.kubernetes\\.io/ingress\\.class"
+      value = "gce"
     },
     {
-      name  = "provider"
-      value = "google"
+      name  = "ingress.annotations.networking\\.gke\\.io/managed-certificates"
+      value = "argo-cd-cert"
     },
     {
-      name  = "google.project"
-      value = data.google_project.current.project_id
+      name  = "server.ingress.annotations.external-dns\\.alpha\\.kubernetes\\.io/hostname"
+      value = "argocd.ols.blast.co.id"
     },
     {
-      name  = "zoneVisibility"
-      value = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_zone_visibility
+      name  = "server.ingress.enabled"
+      value = true
+    },
+    {
+      name  = "server.ingress.hosts[0]"
+      value = "argocd.ols.blast.co.id"
+    },
+    {
+      name = "server.GKEmanagedCertificate.enabled"
+      value = true
+    },
+    {
+      name = "server.GKEmanagedCertificate.domains[0]"
+      value = "argocd.ols.blast.co.id"
     }
   ]
-  namespace        = "ingress"
+  namespace = "cd"
+  create_namespace = true
 }

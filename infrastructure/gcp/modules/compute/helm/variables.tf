@@ -80,6 +80,16 @@ variable "namespace" {
   default     = "default"
 }
 
+variable "create_namespace" {
+  type        = bool
+  description = "create namespace"
+}
+
+variable "create_managed_certificate" {
+  type        = bool
+  description = "create managed certificate"
+}
+
 variable "helm_sets" {
   type        = list(object({ name : string, value : any }))
   description = "list of helm set"
