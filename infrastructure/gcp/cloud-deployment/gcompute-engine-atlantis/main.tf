@@ -17,14 +17,14 @@ data "terraform_remote_state" "vpc_ols_network" {
 }
 
 # Terraform state data gkubernetes engine
-# data "terraform_remote_state" "gkubernetes_engine_ols" {
-#   backend = "gcs"
+data "terraform_remote_state" "gkubernetes_engine_ols" {
+  backend = "gcs"
 
-#   config = {
-#     bucket = "ols-dev-gcloud-storage-tfstate"
-#     prefix = "gkubernetes-engine/ols-dev-gkubernetes-engine-ols"
-#   }
-# }
+  config = {
+    bucket = "ols-dev-gcloud-storage-tfstate"
+    prefix = "gkubernetes-engine/ols-dev-gkubernetes-engine-ols"
+  }
+}
 
 # Terraform state data gcloud dns
 data "terraform_remote_state" "gcloud_dns_ols" {
@@ -115,11 +115,11 @@ module "gcompute-engine" {
     ttl           = 300
   }
   run_ansible       = true
-  ansible_tags      = ["initialization"]
+  ansible_tags      = ["setup_kubectl"]
   ansible_skip_tags = []
   ansible_vars = {
     project_id            = data.google_project.current.project_id
-    # cluster_name          = data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name
+    cluster_name          = data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name
     region                = "asia-southeast2-a"
     github_token          = data.google_kms_secret.github_token.plaintext
     github_webhook_secret = data.google_kms_secret.github_webhook_secret.plaintext

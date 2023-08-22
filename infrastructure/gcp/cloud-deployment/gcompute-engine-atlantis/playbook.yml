@@ -16,7 +16,7 @@
       tags: 
         - setup_nginx
         - initialization
-    # - role: setup_kubectl
-    #   tags: 
-    #     - setup_kubectl
-    #     - initialization      
+    - role: setup_kubectl
+      tags: 
+        - setup_kubectl
+        - initialization      
