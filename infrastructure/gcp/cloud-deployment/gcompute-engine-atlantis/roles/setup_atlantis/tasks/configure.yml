@@ -1,12 +1,3 @@
-- name: Create Atlantis user
-  become: yes
-  user:
-    name: atlantis
-    system: yes
-  tags: 
-    - configure_atlantis
-    - create_atlantis_user
-
 - name: Create Atlantis config directory
   become: yes
   file:

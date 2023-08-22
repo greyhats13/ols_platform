@@ -1,23 +1,19 @@
 version: 3
 projects:
+  - dir: cloud-deployment/gcloud-storage-tfstate
+    apply_requirements: ["approved", "mergeable"]
+    autoplan:
+      when_modified: ["*.tf*"]
   - dir: cloud-deployment/vpc
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
       enabled: true
-  - dir: cloud-deployment/gcloud-storage-tfstate
-    apply_requirements: ["approved", "mergeable"]
-    autoplan:
-      when_modified: ["*.tf*"]
-  - dir: cloud-deployment/gkubernetes-engine-ols
-    apply_requirements: ["approved", "mergeable"]
-    autoplan:
-      when_modified: ["*.tf*"]
   - dir: cloud-deployment/gcloud-dns-ols
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: cloud-deployment/gcompute-engine-bastion
+  - dir: cloud-deployment/gcloud-kms-ols
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
@@ -25,7 +21,11 @@ projects:
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*", "*.yml*"]
-  - dir: cloud-deployment/gcloud-kms-ols
+  - dir: cloud-deployment/gcompute-engine-bastion
+    apply_requirements: ["approved", "mergeable"]
+    autoplan:
+      when_modified: ["*.tf*"]
+  - dir: cloud-deployment/gkubernetes-engine-ols
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]

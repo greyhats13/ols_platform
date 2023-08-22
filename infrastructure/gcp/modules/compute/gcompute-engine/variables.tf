@@ -41,9 +41,9 @@ variable "zone" {
   description = "The Google Cloud zone within the region for resource placement."
 }
 
-variable "username" {
+variable "linux_user" {
   type        = string
-  description = "Username for accessing the virtual machine instances."
+  description = "linux user for accessing the virtual machine instances."
 }
 
 variable "machine_type" {

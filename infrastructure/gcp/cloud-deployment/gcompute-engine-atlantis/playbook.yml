@@ -4,10 +4,6 @@
       tags: 
         - setup_ansible
         - initialization
-    - role: setup_kubectl
-      tags: 
-        - setup_kubectl
-        - initialization
     - role: setup_terraform
       tags: 
         - setup_terraform
@@ -19,4 +15,8 @@
     - role: setup_nginx
       tags: 
         - setup_nginx
-        - initialization      
+        - initialization
+    # - role: setup_kubectl
+    #   tags: 
+    #     - setup_kubectl
+    #     - initialization      

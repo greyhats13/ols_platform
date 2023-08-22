@@ -17,14 +17,14 @@ data "terraform_remote_state" "vpc_ols_network" {
 }
 
 # Terraform state data gkubernetes engine
-data "terraform_remote_state" "gkubernetes_engine_ols" {
-  backend = "gcs"
+# data "terraform_remote_state" "gkubernetes_engine_ols" {
+#   backend = "gcs"
 
-  config = {
-    bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "gkubernetes-engine/ols-dev-gkubernetes-engine-ols"
-  }
-}
+#   config = {
+#     bucket = "ols-dev-gcloud-storage-tfstate"
+#     prefix = "gkubernetes-engine/ols-dev-gkubernetes-engine-ols"
+#   }
+# }
 
 # Terraform state data gcloud dns
 data "terraform_remote_state" "gcloud_dns_ols" {
@@ -81,7 +81,7 @@ module "gcompute-engine" {
   zone                 = "asia-southeast2-a"
   project_id           = data.google_project.current.project_id
   service_account_role = "roles/owner"
-  username             = "debian" # linux or windows username
+  linux_user           = "atlantis"
   machine_type         = "e2-medium"
   disk_size            = 20
   disk_type            = "pd-standard"
@@ -119,7 +119,7 @@ module "gcompute-engine" {
   ansible_skip_tags = []
   ansible_vars = {
     project_id            = data.google_project.current.project_id
-    cluster_name          = data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name
+    # cluster_name          = data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name
     region                = "asia-southeast2-a"
     github_token          = data.google_kms_secret.github_token.plaintext
     github_webhook_secret = data.google_kms_secret.github_webhook_secret.plaintext
