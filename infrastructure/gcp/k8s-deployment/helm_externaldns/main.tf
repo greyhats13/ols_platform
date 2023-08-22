@@ -2,7 +2,7 @@
 terraform {
   backend "gcs" {
     bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "helm/ols-dev-compute-helm-externaldns"
+    prefix = "helm/ols-dev-helm-externaldns"
   }
 }
 
