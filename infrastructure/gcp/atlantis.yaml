@@ -33,7 +33,7 @@ projects:
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: k8s-deployment/helm-argocd
+  - dir: infrastructure/gcp/k8s-deployment/helm-argocd
     apply_requirements: []
     autoplan:
       when_modified: ["*.tf*"]
