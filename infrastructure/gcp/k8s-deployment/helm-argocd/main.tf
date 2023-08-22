@@ -14,8 +14,8 @@ module "helm" {
   unit                   = "ols"
   env                    = "dev"
   code                   = "helm"
-  feature                = "argo-cd"
-  release_name           = "argo-cd"
+  feature                = "argocd"
+  release_name           = "argocd"
   repository             = "https://argoproj.github.io/argo-helm"
   chart                  = "argo-cd"
   create_service_account = false
@@ -30,12 +30,16 @@ module "helm" {
   values                     = []
   helm_sets = [
     {
+      name  = "server.service.type"
+      value = "NodePort" # for using GCE ingress
+    },
+    {
       name  = "server.ingress.annotations.kubernetes\\.io/ingress\\.class"
       value = "gce"
     },
     {
       name  = "ingress.annotations.networking\\.gke\\.io/managed-certificates"
-      value = "argo-cd-cert"
+      value = "argocd-cert"
     },
     {
       name  = "server.ingress.annotations.external-dns\\.alpha\\.kubernetes\\.io/hostname"
@@ -50,14 +54,14 @@ module "helm" {
       value = "argocd.ols.blast.co.id"
     },
     {
-      name = "server.GKEmanagedCertificate.enabled"
+      name  = "server.GKEmanagedCertificate.enabled"
       value = true
     },
     {
-      name = "server.GKEmanagedCertificate.domains[0]"
+      name  = "server.GKEmanagedCertificate.domains[0]"
       value = "argocd.ols.blast.co.id"
     }
   ]
-  namespace = "cd"
+  namespace        = "cd"
   create_namespace = true
 }
