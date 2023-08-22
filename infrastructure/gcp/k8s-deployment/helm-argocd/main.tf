@@ -30,6 +30,10 @@ module "helm" {
   values                     = []
   helm_sets = [
     {
+      name = "server.service.type"
+      value = "NodePort" # for using GCE ingress
+    }
+    {
       name  = "server.ingress.annotations.kubernetes\\.io/ingress\\.class"
       value = "gce"
     },
