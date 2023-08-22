@@ -15,7 +15,6 @@ resource "google_project_iam_member" "sa_iam" {
 
 # Create namespace
 resource "kubernetes_namespace" "namespace" {
-  count   = var.create_service_account ? 1 : 0
   metadata {
     name = var.namespace
   }
@@ -26,7 +25,7 @@ resource "kubernetes_service_account" "ksa" {
   count = var.create_service_account ? 1 : 0
   metadata {
     name      = "${var.unit}-${var.env}-${var.code}-${var.feature}"
-    namespace = var.namespace
+    namespace = kubernetes_namespace.namespace.metadata[0].name
   }
 
   automount_service_account_token = true
@@ -63,7 +62,7 @@ resource "kubernetes_cluster_role_binding" "external_dns" {
   subject {
     kind      = "ServiceAccount"
     name      = kubernetes_cluster_role.external_dns[0].metadata[0].name
-    namespace = var.namespace
+    namespace = kubernetes_namespace.namespace.metadata[0].name
   }
 }
 
@@ -73,7 +72,7 @@ resource "helm_release" "helm" {
   repository = var.repository
   chart      = var.chart
   values     = length(var.values) > 0 ? var.values : []
-  namespace  = var.namespace
+  namespace  = kubernetes_namespace.namespace.metadata[0].name
   lint       = true
   dynamic "set" {
     for_each = length(var.helm_sets) > 0 ? {
@@ -84,5 +83,4 @@ resource "helm_release" "helm" {
       value = set.value.value
     }
   }
-  create_namespace = var.create_namespace
 }

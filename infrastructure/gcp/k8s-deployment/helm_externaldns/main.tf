@@ -56,15 +56,10 @@ module "externaldns" {
       name  = "google.project"
       value = data.google_project.current.project_id
     },
-    # {
-    #   name  = "google.serviceAccountSecretKey"
-    #   value = "../../secrets/onlineshop-378118-e796d2c86870.json"
-    # },
     {
       name  = "zoneVisibility"
       value = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_zone_visibility
     }
   ]
   namespace        = "ingress"
-  create_namespace = true
 }
