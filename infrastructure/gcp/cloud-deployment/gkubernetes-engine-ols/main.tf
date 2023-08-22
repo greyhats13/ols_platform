@@ -149,7 +149,7 @@ module "gkubernetes_engine" {
     spot = {
       min_node_count  = 2
       max_node_count  = 20
-      location_policy = "BALANCED"
+      location_policy = "ANY"
     }
   }
 
