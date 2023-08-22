@@ -15,6 +15,14 @@ provider "google" {
 }
 
 # create provider for helm and get credential from gke cluster
+# create kubernetes provider
+data "google_client_config" "current" {}
+
+provider "kubernetes" {
+  host                   = "https://${data.terraform_remote_state.cluster.outputs.cluster_endpoint}"
+  token                  = data.google_client_config.current.access_token
+  cluster_ca_certificate = base64decode(data.terraform_remote_state.cluster.outputs.cluster_ca_certificate)
+}
 
 # create helm provider
 provider "helm" {

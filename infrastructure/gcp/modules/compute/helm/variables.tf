@@ -24,6 +24,33 @@ variable "feature" {
   description = "the name of AWS services feature"
 }
 
+# service account arguments
+
+variable "create_service_account" {
+  type        = bool
+  description = "create service account"
+  default     = false
+}
+
+variable "project_id" {
+  type        = string
+  description = "GCP project id"
+}
+
+variable "service_account_role" {
+  type        = string
+  description = "GCP service account role"
+}
+
+variable "kubernetes_cluster_role_rules" {
+  type = object({
+    api_groups : list(string),
+    resources : list(string),
+    verbs : list(string)
+  })
+  description = "kubernetes cluster role rules"
+}
+
 # helm arguments
 variable "release_name" {
   type        = string
@@ -62,5 +89,5 @@ variable "create_namespace" {
 variable "helm_sets" {
   type        = list(object({ name : string, value : any }))
   description = "list of helm set"
-  default = []
+  default     = []
 }
