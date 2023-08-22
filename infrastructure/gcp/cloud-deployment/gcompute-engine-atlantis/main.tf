@@ -120,7 +120,7 @@ module "gcompute-engine" {
   ansible_vars = {
     project_id            = data.google_project.current.project_id
     cluster_name          = data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name
-    region                = "asia-southeast2-a"
+    region                = "asia-southeast2" # asia-southeast2-a for zonal cluster
     github_token          = data.google_kms_secret.github_token.plaintext
     github_webhook_secret = data.google_kms_secret.github_webhook_secret.plaintext
     atlantis_password     = data.google_kms_secret.atlantis_password.plaintext
