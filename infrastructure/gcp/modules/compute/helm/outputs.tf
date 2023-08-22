@@ -1,3 +1,3 @@
-output "helm_metadata" {
+output "metadata" {
   value = helm_release.helm.metadata
 }

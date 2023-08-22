@@ -34,6 +34,11 @@ output "cluster_client_key" {
   sensitive   = true
 }
 
+output "cluster_ca_certificate" {
+  description = "The base64-encoded public certificate that is the root of trust for the cluster, created by the module."
+  value       = module.gkubernetes_engine.cluster_ca_certificate
+}
+
 output "cluster_master_version" {
   description = "The version of the Kubernetes master for the GKE cluster created by the module."
   value       = module.gkubernetes_engine.cluster_master_version

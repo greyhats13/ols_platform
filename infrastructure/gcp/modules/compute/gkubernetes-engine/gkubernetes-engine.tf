@@ -8,12 +8,12 @@ resource "google_container_cluster" "cluster" {
   enable_autopilot = !var.enable_autopilot ? null : true
   # Configure cluster autoscaling if autopilot is not enabled
   dynamic "cluster_autoscaling" {
-    for_each = var.enable_autopilot ? [] : [1]
+    for_each = !var.enable_autopilot ? [var.cluster_autoscaling] : []
     content {
-      enabled = var.cluster_autoscaling.enabled
+      enabled = cluster_autoscaling.value.enabled
       # Define resource limits for autoscaling
       dynamic "resource_limits" {
-        for_each = var.cluster_autoscaling.resource_limits
+        for_each = cluster_autoscaling.value.resource_limits
         content {
           resource_type = resource_limits.key
           minimum       = resource_limits.value.minimum
@@ -33,34 +33,48 @@ resource "google_container_cluster" "cluster" {
   }
   # Configure private cluster settings based on variables
   dynamic "private_cluster_config" {
-    for_each = var.private_cluster_config[var.env].enable_private_endpoint || var.private_cluster_config[var.env].enable_private_nodes ? [1] : []
+    for_each = var.private_cluster_config[var.env].enable_private_endpoint || var.private_cluster_config[var.env].enable_private_nodes ? [lookup(var.private_cluster_config, var.env)] : []
     content {
-      enable_private_endpoint = var.private_cluster_config[var.env].enable_private_endpoint
-      enable_private_nodes    = var.private_cluster_config[var.env].enable_private_nodes
-      master_ipv4_cidr_block  = var.private_cluster_config[var.env].master_ipv4_cidr_block
+      enable_private_endpoint = private_cluster_config.value.enable_private_endpoint
+      enable_private_nodes    = private_cluster_config.value.enable_private_nodes
+      master_ipv4_cidr_block  = private_cluster_config.value.master_ipv4_cidr_block
     }
   }
   # Set binary authorization mode
-  binary_authorization {
-    evaluation_mode = var.binary_authorization.evaluation_mode
+  dynamic "binary_authorization" {
+    for_each = var.binary_authorization != {} || var.binary_authorization.evaluation_mode != null ? [var.binary_authorization] : []
+    content {
+      evaluation_mode = binary_authorization.value.evaluation_mode
+    }
   }
+
   # Configure network policy if not in autopilot mode and enabled
   dynamic "network_policy" {
-    for_each = !var.enable_autopilot && var.network_policy.enabled ? [1] : []
+    for_each = !var.enable_autopilot && var.network_policy.enabled ? [var.network_policy] : []
     content {
-      enabled  = var.network_policy.enabled
-      provider = var.network_policy.provider
+      enabled  = network_policy.value.enabled
+      provider = network_policy.value.provider
     }
   }
   # Set datapath provider (Dataplane V2), incompatible with network policy
   datapath_provider = !var.network_policy.enabled ? var.datapath_provider : null
   # Define authorized networks for master access
-  master_authorized_networks_config {
-    cidr_blocks {
-      cidr_block   = "182.253.194.32/28"
-      display_name = "my-home-public-ip"
+  dynamic "master_authorized_networks_config" {
+    for_each = var.master_authorized_networks_config != {} ? [var.master_authorized_networks_config] : []
+    content {
+      # Define authorized networks
+      dynamic "cidr_blocks" {
+        for_each = [master_authorized_networks_config.value.cidr_blocks]
+        content {
+          cidr_block   = cidr_blocks.value.cidr_block
+          display_name = cidr_blocks.value.display_name
+        }
+      }
+      # Enable access from GCP public IP ranges
+      gcp_public_cidrs_access_enabled = master_authorized_networks_config.value.gcp_public_cidrs_access_enabled
     }
   }
+
   # Define IP allocation policy for cluster and services
   ip_allocation_policy {
     cluster_secondary_range_name  = var.pods_secondary_range_name
@@ -70,13 +84,13 @@ resource "google_container_cluster" "cluster" {
   network    = var.vpc_self_link
   subnetwork = var.subnet_self_link
   # Configure DNS settings based on variables
-  dynamic "access_config" {
-    for_each = var.is_public ? [lookup(var.access_config, var.env)] : []
+  dynamic "dns_config" {
+    for_each = var.dns_config[var.env].cluster_dns != null ? [lookup(var.dns_config, var.env)] : []
     content {
-      nat_ip                 = access_config.value.nat_ip == "" ? null : access_config.value.nat_ip
-      public_ptr_domain_name = access_config.value.public_ptr_domain_name == "" ? null : access_config.value.public_ptr_domain_name
-      network_tier           = access_config.value.network_tier == "" ? null : access_config.value.network_tier
-    } 
+      cluster_dns        = dns_config.value.cluster_dns
+      cluster_dns_scope  = dns_config.value.cluster_dns_scope
+      cluster_dns_domain = dns_config.value.cluster_dns_domain
+    }
   }
   # Define resource labels for the cluster
   resource_labels = {
@@ -140,10 +154,11 @@ resource "google_container_node_pool" "nodepool" {
 
   # Configure autoscaling settings for spot instances
   dynamic "autoscaling" {
-    for_each = each.key == "spot" ? [1] : []
+    for_each = var.autoscaling[each.key] != {} ? [lookup(var.autoscaling, each.key)] : []
     content {
-      min_node_count = var.env == "dev" ? 2 : each.value.node_count
-      max_node_count = each.value.max_node_count
+      min_node_count  = autoscaling.value.min_node_count
+      max_node_count  = autoscaling.value.max_node_count
+      location_policy = autoscaling.value.location_policy
     }
   }
 }

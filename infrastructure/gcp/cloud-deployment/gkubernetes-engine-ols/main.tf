@@ -49,13 +49,22 @@ module "gkubernetes_engine" {
     }
   }
   binary_authorization = {
-    evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
+    evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE" # set to null to disable
   }
   network_policy = {
     enabled  = true
     provider = "CALICO"
   }
   datapath_provider = "ADVANCED_DATAPATH"
+
+  master_authorized_networks_config = {
+    cidr_blocks = {
+      cidr_block   = "182.253.194.32/28"
+      display_name = "my-home-public-ip"
+    }
+    gcp_public_cidrs_access_enabled = false
+  }
+
   private_cluster_config = {
     dev = {
       enable_private_endpoint = false
@@ -128,10 +137,22 @@ module "gkubernetes_engine" {
         enable_secure_boot          = true
         enable_integrity_monitoring = false
       }
-      min_node_count = 0
-      max_node_count = 20
     }
   }
+
+  autoscaling = {
+    ondemand = {
+      # min_node_count  = 2
+      # max_node_count  = 20
+      # location_policy = "BALANCED"
+    }
+    spot = {
+      min_node_count  = 2
+      max_node_count  = 20
+      location_policy = "BALANCED"
+    }
+  }
+
   node_management = {
     auto_repair  = false
     auto_upgrade = false

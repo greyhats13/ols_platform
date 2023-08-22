@@ -14,7 +14,7 @@ data "terraform_remote_state" "ols_dns" {
 
   config = {
     bucket      = "ols-dev-gcloud-storage-tfstate"
-    prefix      = "gcd/ols-dev-network-gcd"
+    prefix      = "gcloud-dns/ols-dev-gcloud-dns-blast"
   }
 }
 
@@ -23,8 +23,8 @@ module "externaldns" {
   region       = "asia-southeast2"
   unit         = "ols"
   env          = "dev"
-  code         = "compute"
-  feature      = "helm"
+  code         = "helm"
+  feature      = "external-dns"
   release_name = "external-dns"
   repository   = "https://charts.bitnami.com/bitnami"
   chart        = "external-dns"
