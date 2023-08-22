@@ -50,7 +50,7 @@ module "gcompute-engine" {
   zone                 = "asia-southeast2-a"
   project_id           = data.google_project.current.project_id
   service_account_role = "roles/viewer"
-  username             = "debian" # linux or windows username
+  linux_user           = "bastion" # linux user
   machine_type         = "e2-medium"
   disk_size            = 20
   disk_type            = "pd-standard"

@@ -13,7 +13,7 @@ resource "google_container_cluster" "cluster" {
       enabled = cluster_autoscaling.value.enabled
       # Define resource limits for autoscaling
       dynamic "resource_limits" {
-        for_each = cluster_autoscaling.value.resource_limits
+        for_each = cluster_autoscaling.value.enabled ? cluster_autoscaling.value.resource_limits : {}
         content {
           resource_type = resource_limits.key
           minimum       = resource_limits.value.minimum
@@ -163,41 +163,41 @@ resource "google_container_node_pool" "nodepool" {
   }
 }
 
-# Workaround for a known bug (https://github.com/hashicorp/terraform-provider-kubernetes/issues/1424)
-data "google_client_config" "current" {}
+# # Workaround for a known bug (https://github.com/hashicorp/terraform-provider-kubernetes/issues/1424)
+# data "google_client_config" "current" {}
 
-provider "kubernetes" {
-  host                   = "https://${google_container_cluster.cluster.endpoint}"
-  token                  = data.google_client_config.current.access_token
-  cluster_ca_certificate = base64decode(google_container_cluster.cluster.master_auth.0.cluster_ca_certificate)
-}
+# provider "kubernetes" {
+#   host                   = "https://${google_container_cluster.cluster.endpoint}"
+#   token                  = data.google_client_config.current.access_token
+#   cluster_ca_certificate = base64decode(google_container_cluster.cluster.master_auth.0.cluster_ca_certificate)
+# }
 
-# Define cluster role binding for client cluster admin
-resource "kubernetes_cluster_role_binding" "client_cluster_admin" {
-  metadata {
-    annotations = {}
-    labels      = {}
-    name        = "client-cluster-admin"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "cluster-admin"
-  }
-  # Define subjects for the role binding
-  subject {
-    kind      = "User"
-    name      = "client"
-    api_group = "rbac.authorization.k8s.io"
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = "default"
-    namespace = "kube-system"
-  }
-  subject {
-    kind      = "Group"
-    name      = "system:masters"
-    api_group = "rbac.authorization.k8s.io"
-  }
-}
+# # Define cluster role binding for client cluster admin
+# resource "kubernetes_cluster_role_binding" "client_cluster_admin" {
+#   metadata {
+#     annotations = {}
+#     labels      = {}
+#     name        = "client-cluster-admin"
+#   }
+#   role_ref {
+#     api_group = "rbac.authorization.k8s.io"
+#     kind      = "ClusterRole"
+#     name      = "cluster-admin"
+#   }
+#   # Define subjects for the role binding
+#   subject {
+#     kind      = "User"
+#     name      = "client"
+#     api_group = "rbac.authorization.k8s.io"
+#   }
+#   subject {
+#     kind      = "ServiceAccount"
+#     name      = "default"
+#     namespace = "kube-system"
+#   }
+#   subject {
+#     kind      = "Group"
+#     name      = "system:masters"
+#     api_group = "rbac.authorization.k8s.io"
+#   }
+# }
