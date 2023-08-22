@@ -36,6 +36,7 @@ module "externaldns" {
     resources  = ["services", "endpoints", "pods"]
     verbs      = ["get", "list", "watch"]
   }
+  create_managed_certificate = false
   values = []
   helm_sets = [
     # Dont create service acocunt
@@ -57,9 +58,14 @@ module "externaldns" {
       value = data.google_project.current.project_id
     },
     {
+      name = "policy"
+      value = "sync"
+    },
+    {
       name  = "zoneVisibility"
       value = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_zone_visibility
     }
   ]
   namespace        = "ingress"
+  create_namespace = true
 }
