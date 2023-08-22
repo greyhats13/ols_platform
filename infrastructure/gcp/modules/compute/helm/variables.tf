@@ -80,12 +80,6 @@ variable "namespace" {
   default     = "default"
 }
 
-variable "create_namespace" {
-  type        = bool
-  description = "helm create namespace"
-  default     = false
-}
-
 variable "helm_sets" {
   type        = list(object({ name : string, value : any }))
   description = "list of helm set"

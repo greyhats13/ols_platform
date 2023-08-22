@@ -2,7 +2,7 @@
 terraform {
   backend "gcs" {
     bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "helm/ols-dev-helm-externaldns"
+    prefix = "helm/ols-dev-helm-external-dns"
   }
 }
 
@@ -56,15 +56,10 @@ module "externaldns" {
       name  = "google.project"
       value = data.google_project.current.project_id
     },
-    # {
-    #   name  = "google.serviceAccountSecretKey"
-    #   value = "../../secrets/onlineshop-378118-e796d2c86870.json"
-    # },
     {
       name  = "zoneVisibility"
       value = data.terraform_remote_state.gcloud_dns_ols.outputs.dns_zone_visibility
     }
   ]
   namespace        = "ingress"
-  create_namespace = true
 }
