@@ -39,7 +39,7 @@ data "terraform_remote_state" "gcloud_dns_ols" {
 # Get current project id
 data "google_project" "current" {}
 
-# create gce from modules gce
+# create Bastion HOst from modules Gcloud Compute Engine
 module "gcompute-engine" {
   source               = "../../modules/compute/gcompute-engine"
   region               = "asia-southeast2"
