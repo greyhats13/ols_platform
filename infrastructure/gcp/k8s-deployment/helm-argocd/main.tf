@@ -14,8 +14,8 @@ module "helm" {
   unit                   = "ols"
   env                    = "dev"
   code                   = "helm"
-  feature                = "argo-cd"
-  release_name           = "argo-cd"
+  feature                = "argocd"
+  release_name           = "argocd"
   repository             = "https://argoproj.github.io/argo-helm"
   chart                  = "argo-cd"
   create_service_account = false
@@ -35,7 +35,7 @@ module "helm" {
     },
     {
       name  = "ingress.annotations.networking\\.gke\\.io/managed-certificates"
-      value = "argo-cd-cert"
+      value = "argocd-cert"
     },
     {
       name  = "server.ingress.annotations.external-dns\\.alpha\\.kubernetes\\.io/hostname"
