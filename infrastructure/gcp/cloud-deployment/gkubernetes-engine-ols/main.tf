@@ -62,7 +62,7 @@ module "gkubernetes_engine" {
       cidr_block   = "182.253.194.32/28"
       display_name = "my-home-public-ip"
     }
-    gcp_public_cidrs_access_enabled = false
+    gcp_public_cidrs_access_enabled = true
   }
 
   private_cluster_config = {
