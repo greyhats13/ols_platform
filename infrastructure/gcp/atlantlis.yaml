@@ -17,18 +17,6 @@ projects:
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: cloud-deployment/gsecret-manager-github-token
-    apply_requirements: ["approved", "mergeable"]
-    autoplan:
-      when_modified: ["*.tf*"]
-  - dir: cloud-deployment/gsecret-manager-github-secret
-    apply_requirements: ["approved", "mergeable"]
-    autoplan:
-      when_modified: ["*.tf*"]
-  - dir: k8s-deployment/helm-atlantis
-    apply_requirements: ["approved", "mergeable"]
-    autoplan:
-      when_modified: ["*.tf*"]
   - dir: cloud-deployment/gcompute-engine-bastion
     apply_requirements: ["approved", "mergeable"]
     autoplan:
@@ -37,11 +25,11 @@ projects:
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*", "*.yml*"]
-  - dir: k8s-deployment/helm-nginx
+  - dir: cloud-deployment/gcloud-kms-ols
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
-  - dir: cloud-deployment/gcloud-kms-ols
+  - dir: k8s-deployment/helm_external_dns
     apply_requirements: ["approved", "mergeable"]
     autoplan:
       when_modified: ["*.tf*"]
