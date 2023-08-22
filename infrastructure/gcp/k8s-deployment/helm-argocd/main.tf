@@ -31,7 +31,7 @@ module "helm" {
   helm_sets = [
     {
       name  = "server.service.type"
-      value = "NodePort" # for using GCE ingress
+      value = "LoadBalancer" # for using GCE ingress
     },
     {
       name  = "server.ingress.annotations.kubernetes\\.io/ingress\\.class"

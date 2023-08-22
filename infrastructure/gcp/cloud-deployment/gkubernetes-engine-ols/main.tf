@@ -29,12 +29,12 @@ module "gkubernetes_engine" {
   code    = "gkubernetes-engine"
   feature = "cluster"
   # cluster arguments
-  issue_client_certificate      = true
+  issue_client_certificate      = false
   vpc_self_link                 = data.terraform_remote_state.vpc_ols_network.outputs.vpc_self_link
   subnet_self_link              = data.terraform_remote_state.vpc_ols_network.outputs.subnet_self_link
   pods_secondary_range_name     = data.terraform_remote_state.vpc_ols_network.outputs.pods_secondary_range_name
   services_secondary_range_name = data.terraform_remote_state.vpc_ols_network.outputs.services_secondary_range_name
-  enable_autopilot              = false
+  enable_autopilot              = true
   cluster_autoscaling = {
     enabled = false
     resource_limits = {
