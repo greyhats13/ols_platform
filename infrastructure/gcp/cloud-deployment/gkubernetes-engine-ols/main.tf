@@ -36,7 +36,7 @@ module "gkubernetes_engine" {
   services_secondary_range_name = data.terraform_remote_state.vpc_ols_network.outputs.services_secondary_range_name
   enable_autopilot              = false
   cluster_autoscaling = {
-    enabled = true
+    enabled = false
     resource_limits = {
       cpu = {
         minimum = 2
