@@ -115,7 +115,7 @@ module "gcompute-engine" {
     ttl           = 300
   }
   run_ansible       = true
-  ansible_tags      = ["setup_kubectl"]
+  ansible_tags      = ["configure_kubectl"]
   ansible_skip_tags = []
   ansible_vars = {
     project_id            = data.google_project.current.project_id
