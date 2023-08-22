@@ -13,7 +13,7 @@ resource "google_container_cluster" "cluster" {
       enabled = cluster_autoscaling.value.enabled
       # Define resource limits for autoscaling
       dynamic "resource_limits" {
-        for_each = cluster_autoscaling.value.resource_limits
+        for_each = cluster_autoscaling.value.enabled ? cluster_autoscaling.value.resource_limits : {}
         content {
           resource_type = resource_limits.key
           minimum       = resource_limits.value.minimum
