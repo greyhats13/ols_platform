@@ -30,9 +30,9 @@ module "helm" {
   values                     = []
   helm_sets = [
     {
-      name = "server.service.type"
+      name  = "server.service.type"
       value = "NodePort" # for using GCE ingress
-    }
+    },
     {
       name  = "server.ingress.annotations.kubernetes\\.io/ingress\\.class"
       value = "gce"
@@ -54,14 +54,14 @@ module "helm" {
       value = "argocd.ols.blast.co.id"
     },
     {
-      name = "server.GKEmanagedCertificate.enabled"
+      name  = "server.GKEmanagedCertificate.enabled"
       value = true
     },
     {
-      name = "server.GKEmanagedCertificate.domains[0]"
+      name  = "server.GKEmanagedCertificate.domains[0]"
       value = "argocd.ols.blast.co.id"
     }
   ]
-  namespace = "cd"
+  namespace        = "cd"
   create_namespace = true
 }
