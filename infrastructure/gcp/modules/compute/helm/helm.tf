@@ -13,6 +13,15 @@ resource "google_project_iam_member" "sa_iam" {
   member  = "serviceAccount:${google_service_account.gsa[0].email}"
 }
 
+# Create namespace
+resource "kubernetes_namespace" "namespace" {
+  count   = var.create_service_account ? 1 : 0
+  metadata {
+    name = var.namespace
+  }
+}
+
+# Create a kubernetes service account
 resource "kubernetes_service_account" "ksa" {
   count = var.create_service_account ? 1 : 0
   metadata {
