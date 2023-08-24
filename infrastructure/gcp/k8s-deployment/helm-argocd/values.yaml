@@ -1,0 +1,70 @@
+global:
+  nodeSelector:
+    iam.gke.io/gke-metadata-server-enabled: "true"
+
+serviceAccount:
+  name: "${unit}-${feature}-${env}-$(vcode)-${feature}"
+  annotations:
+    iam.gke.io/gcp-service-account: "${service_account_annotation}"
+config:
+  params:
+    server.insecure: false
+server:
+  service:
+    # annotations:
+      ## Using Google Cloud Load Balancer but still facing issue with NEG health check
+      # cloud.google.com/neg: '{"ingress": true}'
+      
+      # cloud.google.com/backend-config: '{"ports": {"80":"${unit}-${feature}-server"}}'
+      # cloud.google.com/backend-config: '{"default": "${unit}-${feature}-server"}'
+    type: ClusterIP
+    servicePortHttp: 80
+    servicePortHttpName: http
+  ingress:
+    enabled: true
+    hosts:
+      - "${feature}.${dns_name}"
+    annotations:
+      # use Google Cloud Ingress Controller
+      # kubernetes.io/ingress.class: "gce"
+      # kubernetes.io/ingress.global-static-ip-name: ""
+      nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      external-dns.alpha.kubernetes.io/hostname: "${feature}.${dns_name}"
+      external-dns.alpha.kubernetes.io/ttl: "300"
+      kubernetes.io/tls-acme: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-${unit}-${env}"
+      # networking.gke.io/managed-certificates: "${unit}-${feature}-server"
+    ## use Nginx Ingress Controller
+    ingressClassName: "nginx"
+    tls:
+      - secretName: "${unit}-${feature}-server-tls"
+        hosts:
+          - "${feature}.${dns_name}"
+    # http: false
+  # GKEmanagedCertificate:
+  #   enabled: true
+  #   domains:
+  #     - "${feature}.${dns_name}"
+  # GKEbackendConfig:
+  #   enabled: true
+  #   spec:
+  #     healthCheck:
+  #       checkIntervalSec: 5
+  #       timeoutSec: 5
+  #       healthyThreshold: 2
+  #       unhealthyThreshold: 2
+  #       type: HTTP
+  #       requestPath: /healthz
+  #       port: 80
+  #     logging:
+  #       enable: true
+  #       sampleRate: 0.5
+  # GKEfrontendConfig:
+  #   enabled: true
+  #   spec:
+  #     redirectToHttps:
+  #       enabled: true
+  #       responseCodeName: MOVED_PERMANENTLY_DEFAULT
+
+    

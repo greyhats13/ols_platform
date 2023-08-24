@@ -19,36 +19,22 @@ data "terraform_remote_state" "gcloud_dns_ols" {
 }
 
 module "externaldns" {
-  source                 = "../../modules/compute/helm"
-  region                 = "asia-southeast2"
-  unit                   = "ols"
-  env                    = "dev"
-  code                   = "helm"
-  feature                = "external-dns"
-  release_name           = "external-dns"
-  repository             = "https://charts.bitnami.com/bitnami"
-  chart                  = "external-dns"
-  create_service_account = true
-  project_id             = data.google_project.current.project_id
-  service_account_role   = "roles/dns.admin"
-  kubernetes_cluster_role_rules = {
-    api_groups = [""]
-    resources  = ["services", "endpoints", "pods"]
-    verbs      = ["get", "list", "watch"]
-  }
-  create_managed_certificate = false
-  values = []
+  source                      = "../../modules/compute/helm"
+  region                      = "asia-southeast2"
+  unit                        = "ols"
+  env                         = "dev"
+  code                        = "helm"
+  feature                     = "external-dns"
+  release_name                = "external-dns"
+  repository                  = "https://charts.bitnami.com/bitnami"
+  chart                       = "external-dns"
+  create_gservice_account      = true
+  use_gworkload_identity       = true
+  project_id                  = data.google_project.current.project_id
+  google_service_account_role = "roles/dns.admin"
+  create_gmanaged_certificate = false
+  values                     = ["${file("values.yaml")}"]
   helm_sets = [
-    # Dont create service acocunt
-    {
-      name = "serviceAccount.create"
-      value = false
-    },
-    # Use existing service account if create_service_account is set to true
-    {
-      name = "serviceAccount.name"
-      value = "ols-dev-helm-external-dns"
-    },
     {
       name  = "provider"
       value = "google"
@@ -58,7 +44,7 @@ module "externaldns" {
       value = data.google_project.current.project_id
     },
     {
-      name = "policy"
+      name  = "policy"
       value = "sync"
     },
     {

@@ -26,9 +26,15 @@ variable "feature" {
 
 # service account arguments
 
-variable "create_service_account" {
+variable "create_gservice_account" {
   type        = bool
-  description = "create service account"
+  description = "create google service account"
+  default     = false
+}
+
+variable "use_gworkload_identity" {
+  type        = bool
+  description = "use google workload identity"
   default     = false
 }
 
@@ -37,18 +43,9 @@ variable "project_id" {
   description = "GCP project id"
 }
 
-variable "service_account_role" {
+variable "google_service_account_role" {
   type        = string
   description = "GCP service account role"
-}
-
-variable "kubernetes_cluster_role_rules" {
-  type = object({
-    api_groups : list(string),
-    resources : list(string),
-    verbs : list(string)
-  })
-  description = "kubernetes cluster role rules"
 }
 
 # helm arguments
@@ -85,7 +82,12 @@ variable "create_namespace" {
   description = "create namespace"
 }
 
-variable "create_managed_certificate" {
+variable "dns_name" {
+  type        = string
+  description = "dns name"
+}
+
+variable "create_gmanaged_certificate" {
   type        = bool
   description = "create managed certificate"
 }
@@ -94,4 +96,10 @@ variable "helm_sets" {
   type        = list(object({ name : string, value : any }))
   description = "list of helm set"
   default     = []
+}
+
+variable "after_helm_manifest" {
+  type        = string
+  description = "after helm manifest"
+  default     = null
 }

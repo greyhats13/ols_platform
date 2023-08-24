@@ -5,4 +5,4 @@ metadata:
   namespace: ${namespace}
 spec:
   domains:
-    - ${feature}.ols.blast.co.id
+    - ${feature}.${dns_name}

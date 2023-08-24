@@ -2,7 +2,7 @@ apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
   name: atlantis-cert
-  namespace: ci
+  namespace: cd
 spec:
   domains:
-    - atlantis2.ols.blast.co.id
+    - argocd.ols.blast.co.id

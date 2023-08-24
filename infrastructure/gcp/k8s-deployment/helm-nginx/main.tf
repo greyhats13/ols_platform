@@ -1,45 +1,40 @@
 # Terraform State Storage
 terraform {
   backend "gcs" {
-    bucket      = "ols-dev-gcloud-storage-tfstate"
-    prefix      = "helm/ols-dev-compute-helm-nginx"
-    # credentials = "../../secrets/onlineshop-378118-e796d2c86870.json"
+    bucket = "ols-dev-gcloud-storage-tfstate"
+    prefix = "helm/ols-dev-helm-nginx"
   }
 }
 
+data "terraform_remote_state" "gcloud_dns_ols" {
+  backend = "gcs"
+
+  config = {
+    bucket = "ols-dev-gcloud-storage-tfstate"
+    prefix = "gcloud-dns/ols-dev-gcloud-dns-blast"
+  }
+}
+
+
+data "google_project" "current" {}
+
 module "helm" {
-  source       = "../../modules/compute/helm"
-  region       = "asia-southeast2"
-  unit         = "ols"
-  env          = "dev"
-  code         = "compute"
-  feature      = "helm"
-  release_name = "nginx"
-  repository   = "https://kubernetes.github.io/ingress-nginx"
-  chart        = "ingress-nginx"
-  values       = []
-  helm_sets = [
-    {
-      name  = "controller.replicaCount"
-      value = 1
-    },
-    {
-      name  = "controller.autoscaling.enabled"
-      value = true
-    },
-    {
-      name  = "controller.autoscaling.minReplicas"
-      value = 1
-    },
-    {
-      name  = "controller.autoscaling.maxReplicas"
-      value = 2
-    },
-    {
-      name  = "controller.image.tag"
-      value = "v1.8.1"
-    }
-  ]
-  namespace        = "ingress"
-  create_namespace = true
+  source                      = "../../modules/compute/helm"
+  region                      = "asia-southeast2"
+  unit                        = "ols"
+  env                         = "dev"
+  code                        = "helm"
+  feature                     = "nginx"
+  release_name                = "nginx"
+  repository                  = "https://kubernetes.github.io/ingress-nginx"
+  chart                       = "ingress-nginx"
+  values                      = ["${file("values.yaml")}"]
+  namespace                   = "ingress"
+  create_namespace            = false
+  create_gservice_account     = false
+  use_gworkload_identity      = false
+  project_id                  = data.google_project.current.project_id
+  google_service_account_role = null
+  dns_name                    = trimsuffix(data.terraform_remote_state.gcloud_dns_ols.outputs.dns_name, ".")
+  create_gmanaged_certificate  = false
 }
