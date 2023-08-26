@@ -26,21 +26,4 @@ variable "feature" {
 
 # gsm arguments
 
-variable "gsm_secret_id" {
-  type = string
-  description = "the name of the secret"
-}
-
-variable "gsm_labels" {
-  type = map(string)
-  description = "the labels of the secret"
-  default = {}
-}
-
-variable "gsm_annotations" {
-  type = map(string)
-  description = "the annotations of the secret"
-  default = {}
-}
-
-variable "gsm_secret_data" {}
+variable "secret_data" {}

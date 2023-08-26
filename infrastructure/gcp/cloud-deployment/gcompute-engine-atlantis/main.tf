@@ -17,14 +17,14 @@ data "terraform_remote_state" "vpc_ols_network" {
 }
 
 # Terraform state data gkubernetes engine
-data "terraform_remote_state" "gkubernetes_engine_ols" {
-  backend = "gcs"
+# data "terraform_remote_state" "gkubernetes_engine_ols" {
+#   backend = "gcs"
 
-  config = {
-    bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "gkubernetes-engine/ols-dev-gkubernetes-engine-ols"
-  }
-}
+#   config = {
+#     bucket = "ols-dev-gcloud-storage-tfstate"
+#     prefix = "gkubernetes-engine/ols-dev-gkubernetes-engine-ols"
+#   }
+# }
 
 # Terraform state data gcloud dns
 data "terraform_remote_state" "gcloud_dns_ols" {
@@ -36,36 +36,17 @@ data "terraform_remote_state" "gcloud_dns_ols" {
   }
 }
 
-# Terraform state data kms cryptokey
-data "terraform_remote_state" "kms_ols_cryptokey" {
-  backend = "gcs"
-
-  config = {
-    bucket = "ols-dev-gcloud-storage-tfstate"
-    prefix = "gcloud-kms/ols-dev-gcloud-kms-ols"
-  }
+data "google_secret_manager_secret_version" "github_token" {
+  secret = "github-token"
 }
 
-# Load encrypted github token and webhook secret from github.auto.tfvars
-variable "github_token_ciphertext" {}
-variable "github_webhook_secret_ciphertext" {}
-variable "atlantis_password_ciphertext" {}
-
-# Decrypt github token and webhook secret using kms cryptokey
-data "google_kms_secret" "github_token" {
-  crypto_key = data.terraform_remote_state.kms_ols_cryptokey.outputs.cryptokey_id
-  ciphertext = var.github_token_ciphertext
+data "google_secret_manager_secret_version" "github_webhook_secret" {
+  secret = "github-webhook-secret"
 }
 
-data "google_kms_secret" "github_webhook_secret" {
-  crypto_key = data.terraform_remote_state.kms_ols_cryptokey.outputs.cryptokey_id
-  ciphertext = var.github_webhook_secret_ciphertext
-}
-
-data "google_kms_secret" "atlantis_password" {
-  crypto_key = data.terraform_remote_state.kms_ols_cryptokey.outputs.cryptokey_id
-  ciphertext = var.atlantis_password_ciphertext
-}
+# data "google_secret_manager_secret_version" "atlantis_password" {
+#   secret = "atlantis-password"
+# }
 
 # Get current project id
 data "google_project" "current" {}
@@ -119,11 +100,11 @@ module "gcompute-engine" {
   ansible_skip_tags = []
   ansible_vars = {
     project_id            = data.google_project.current.project_id
-    cluster_name          = data.terraform_remote_state.gkubernetes_engine_ols.outputs.cluster_name
+    cluster_name          = "ols-dev-gkubernetes-engine-ols"
     region                = "asia-southeast2" # asia-southeast2-a for zonal cluster
-    github_token          = data.google_kms_secret.github_token.plaintext
-    github_webhook_secret = data.google_kms_secret.github_webhook_secret.plaintext
-    atlantis_password     = data.google_kms_secret.atlantis_password.plaintext
+    github_token          = data.google_secret_manager_secret_version.github_token.secret_data
+    github_webhook_secret = data.google_secret_manager_secret_version.github_webhook_secret.secret_data
+    atlantis_password     = "Makanan13"
   }
   firewall_rules = {
     "ssh" = {

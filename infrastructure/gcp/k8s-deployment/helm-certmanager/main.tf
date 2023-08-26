@@ -15,9 +15,6 @@ data "terraform_remote_state" "gcloud_dns_ols" {
   }
 }
 
-
-data "google_project" "current" {}
-
 module "helm" {
   source                      = "../../modules/compute/helm"
   region                      = "asia-southeast2"
@@ -25,17 +22,9 @@ module "helm" {
   env                         = "dev"
   code                        = "helm"
   feature                     = "cert-manager"
-  release_name                = "cert-manager"
   repository                  = "https://charts.jetstack.io"
   chart                       = "cert-manager"
   values                      = ["${file("values.yaml")}"]
   namespace                   = "ingress"
-  create_namespace            = false
-  create_gservice_account     = false
-  use_gworkload_identity      = false
-  project_id                  = data.google_project.current.project_id
-  google_service_account_role = null
-  dns_name                    = trimsuffix(data.terraform_remote_state.gcloud_dns_ols.outputs.dns_name, ".")
-  create_gmanaged_certificate = false
   after_helm_manifest         = "cluster-issuer.yaml"
 }

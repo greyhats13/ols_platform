@@ -25,7 +25,6 @@ module "externaldns" {
   env                         = "dev"
   code                        = "helm"
   feature                     = "external-dns"
-  release_name                = "external-dns"
   repository                  = "https://charts.bitnami.com/bitnami"
   chart                       = "external-dns"
   create_gservice_account      = true

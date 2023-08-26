@@ -1,3 +1,16 @@
+# data source
+data "terraform_remote_state" "gcloud_dns_ols" {
+  backend = "gcs"
+
+  config = {
+    bucket = "ols-dev-gcloud-storage-tfstate"
+    prefix = "gcloud-dns/ols-dev-gcloud-dns-blast"
+  }
+}
+
+data "google_project" "current" {}
+
+
 # Create namespace
 resource "kubernetes_namespace" "namespace" {
   count = var.create_namespace ? 1 : 0
@@ -38,8 +51,11 @@ resource "google_service_account_iam_binding" "external_dns_binding" {
   service_account_id = google_service_account.gsa[0].name
   role               = "roles/iam.serviceAccountTokenCreator"
 
-  members = [
+  members = var.feature !="argocd" ? [
     "serviceAccount:${var.project_id}.svc.id.goog[${local.namespace}/${local.service_account_name}]"
+  ]: [
+    "serviceAccount:${var.project_id}.svc.id.goog[${local.namespace}/${var.feature}-server]",
+    "serviceAccount:${var.project_id}.svc.id.goog[${local.namespace}/${var.feature}-application-controller]"
   ]
 }
 
@@ -54,10 +70,10 @@ resource "google_service_account_iam_binding" "workload_identity_binding" {
 }
 
 resource "helm_release" "helm" {
-  name       = "${var.unit}-${var.release_name}"
+  name       = "${var.unit}-${var.feature}"
   repository = var.repository
   chart      = var.chart
-  values = length(var.values) > 0 ? [
+  values = length(var.values) > 0 ? sensitive([
     "${templatefile(
       "values.yaml",
       {
@@ -67,10 +83,11 @@ resource "helm_release" "helm" {
         feature                    = var.feature
         dns_name                   = var.dns_name
         service_account_annotation = var.create_gservice_account ? google_service_account.gsa[0].email : null
+        values_extra_vars          = var.values_extra_vars
       }
       )
     }"
-  ] : []
+  ]) : []
   namespace = local.namespace
   lint      = true
   dynamic "set" {
@@ -82,17 +99,37 @@ resource "helm_release" "helm" {
       value = set.value.value
     }
   }
+
+  dynamic "set_sensitive" {
+    for_each = length(var.helm_sets_sensitive) > 0 ? {
+      for helm_key, helm_set_sensitive in var.helm_sets_sensitive : helm_key => helm_set_sensitive
+    } : {}
+    content {
+      name  = set_sensitive.value.name
+      value = set_sensitive.value.value
+    }
+  }
+    dynamic "set_list" {
+    for_each = length(var.helm_sets_list) > 0 ? {
+      for helm_key, helm_set_list in var.helm_sets_list : helm_key => helm_set_list
+    } : {}
+    content {
+      name  = set_list.value.name
+      value = set_list.value.value
+    }
+  }
 }
 
 resource "kubernetes_manifest" "after_helm_manifest" {
   count = var.after_helm_manifest != null ? 1 : 0
   manifest = yamldecode(templatefile("${var.after_helm_manifest}", {
-    unit      = var.unit,
-    env       = var.env,
-    code      = var.code,
-    feature   = var.feature,
-    namespace = local.namespace,
-    dns_name  = var.dns_name
+    unit              = var.unit,
+    env               = var.env,
+    code              = var.code,
+    feature           = var.feature,
+    namespace         = local.namespace,
+    dns_name          = var.dns_name
+    values_extra_vars = var.values_extra_vars
   }))
   depends_on = [helm_release.helm]
 }

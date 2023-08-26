@@ -25,7 +25,6 @@ module "helm" {
   env                         = "dev"
   code                        = "helm"
   feature                     = "nginx"
-  release_name                = "nginx"
   repository                  = "https://kubernetes.github.io/ingress-nginx"
   chart                       = "ingress-nginx"
   values                      = ["${file("values.yaml")}"]

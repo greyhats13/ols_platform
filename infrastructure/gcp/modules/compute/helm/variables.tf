@@ -38,22 +38,13 @@ variable "use_gworkload_identity" {
   default     = false
 }
 
-variable "project_id" {
-  type        = string
-  description = "GCP project id"
-}
-
 variable "google_service_account_role" {
   type        = string
   description = "GCP service account role"
+  default     = null
 }
 
 # helm arguments
-variable "release_name" {
-  type        = string
-  description = "helm release name"
-  default     = "helm"
-}
 
 variable "repository" {
   type        = string
@@ -74,22 +65,25 @@ variable "values" {
 variable "namespace" {
   type        = string
   description = "helm namespace"
-  default     = "default"
+  default     = null
 }
 
 variable "create_namespace" {
   type        = bool
   description = "create namespace"
+  default     = false
 }
 
 variable "dns_name" {
   type        = string
   description = "dns name"
+  default     = null
 }
 
 variable "create_gmanaged_certificate" {
   type        = bool
   description = "create managed certificate"
+  default     = false
 }
 
 variable "helm_sets" {
@@ -98,8 +92,27 @@ variable "helm_sets" {
   default     = []
 }
 
+variable "helm_sets_sensitive" {
+  type        = list(object({ name : string, value : any }))
+  description = "list of helm set sensitive"
+  default     = []
+}
+
+variable "helm_sets_list" {
+  type        = list(object({ name : string, value : any }))
+  description = "list of helm set list"
+  default     = []
+}
+
 variable "after_helm_manifest" {
   type        = string
   description = "after helm manifest"
   default     = null
+}
+
+variable "values_extra_vars" {
+  type        = map(string)
+  description = "helm values extra vars"
+  default     = {}
+  sensitive   = true
 }
