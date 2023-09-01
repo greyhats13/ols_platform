@@ -1,6 +1,6 @@
-# OL Shop
+# Online Shop Platform
 
-Welcome to the OL Shop repository! This project is a personal endeavor aimed at creating an online shopping platform with a microservices architecture. Please note that this project is still under development and may undergo significant changes.
+Welcome to the Online Shop repository! This project is a personal endeavor aimed at creating an online shopping platform with a microservices architecture. Please note that this project is still under development and may undergo significant changes.
 
 The repository is organized into two main directories: `infrastructure` and `services`.
 

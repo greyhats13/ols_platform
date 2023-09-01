@@ -1,0 +1,101 @@
+# Default values for genai.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: greyhats13/ols-svc-genai
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: alpha-5101d62c
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+appConfig:
+  #App Config
+  APP_HOST: 0.0.0.0
+  APP_PORT: 8000
+  APP_LOG_LEVEL: debug
+  #OpenAI Config
+  MAX_RESPONSE_TOKENS: 250
+  TOKEN_LIMIT: 4096
+  CHATCOMPLETION_MODEL: gpt-3.5-turbo
+  # GCP Config
+  PROJECT_ID: ols-platform-dev
+  LOCATION_ID: global
+  KEY_RING_ID: ols-dev-security-kms-keyring
+  CRYPTO_KEY_ID: ols-dev-security-kms-cryptokey
+appSecret:
+  # Chipertext OpenAI API Key
+  OPENAI_API_KEY: CiQAyKnBR+rPEGi2uQShykiDaM4ZD4hLySY5/WAwDYtQlS0M++YSXACfAnYWPC/GfU+BgUWwWC3r6I80jqGlQqsYgXtQ4Ew/dUVqeGIv4d/V5qbGyps84otuSOQ11WSBYM1vmzFoqYHAHSr63xo7M9ZZZQcwP9ZdeLkoK8H7U00k2cD0
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations:
+    iam.gke.io/gcp-service-account: "ols-svc-genai@ols-platform-dev.iam.gserviceaccount.com"
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: enabled
+  className: "nginx"
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: "genai.dev.ols.blast.co.id"
+    cert-manager.io/cluster-issuer: "letsencrypt-ols-dev"
+    kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: genai.dev.ols.blast.co.id
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - hosts:
+        - genai.dev.ols.blast.co.id
+      secretName: genai-tls
+
+resources:
+  {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 75
+
+nodeSelector:
+  iam.gke.io/gke-metadata-server-enabled: "true"
+
+tolerations: []
+
+affinity: {}
